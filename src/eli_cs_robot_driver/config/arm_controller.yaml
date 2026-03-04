@@ -1,0 +1,17 @@
+arm_controller:
+  ros__parameters:
+    joints:
+      - shoulder_pan_joint
+      - shoulder_lift_joint
+      - elbow_joint
+      - wrist_1_joint
+      - wrist_2_joint
+      - wrist_3_joint
+
+    # 关节轨迹控制器使用的位置命令接口
+    command_interfaces:
+      - position
+
+    # 读取状态时需要的接口（至少包含 position；如果硬件有 velocity、acceleration 也可以加上）
+    state_interfaces:
+      - position

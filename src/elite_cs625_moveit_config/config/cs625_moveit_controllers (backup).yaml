@@ -1,0 +1,20 @@
+# This file is loaded by move_group via MoveItConfigsBuilder.
+# It tells MoveIt how to talk to a ros2_control controller.
+moveit_simple_controller_manager:
+  ros__parameters:
+    controller_names:
+      - arm_controller
+
+    arm_controller:
+      type: FollowJointTrajectory
+      action_ns: follow_joint_trajectory # This namespace must match the one used by the ros2_control controller
+      default: true
+      # The joints list here is for MoveIt's information.
+      # The actual joints are defined in cs625_controllers.yaml for ros2_control.
+      joints:
+        - shoulder_pan_joint
+        - shoulder_lift_joint
+        - elbow_joint
+        - wrist_1_joint
+        - wrist_2_joint
+        - wrist_3_joint

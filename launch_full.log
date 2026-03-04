@@ -1,0 +1,8 @@
+[INFO] [launch]: All log files can be found below /home/yff/.ros/log/2026-03-01-08-34-59-587198-yff-VMware-Virtual-Platform-4931
+[INFO] [launch]: Default logging verbosity is set to INFO
+==================================================
+[DEBUGGER] In move_group.launch.py, the resolved value of 'name' is: 'cs625'
+[DEBUGGER] In move_group.launch.py, the resolved value of 'cs_type' is: 'cs625'
+==================================================
+[ERROR] [launch]: Caught exception in launch (see debug for traceback): "File /home/yff/elite_ros_ws/install/elite_cs625_moveit_config/share/elite_cs625_moveit_config/config/cs.srdf doesn't exist"
+[INFO] [controller_stopper_node-3]: process started with pid [4939]

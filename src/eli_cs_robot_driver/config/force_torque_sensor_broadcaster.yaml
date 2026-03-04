@@ -1,0 +1,4 @@
+force_torque_sensor_broadcaster:
+  ros__parameters:
+    frame_id: "ft_frame"
+    sensor_name: "ft_sensor"

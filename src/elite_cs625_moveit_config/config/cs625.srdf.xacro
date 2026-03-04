@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  这是正确的版本。
+  我们将 'name' 属性从硬编码的 "cs" 改为了一个参数 "$(arg name)"。
+  并且我们定义了这个参数，默认值为 "cs"。
+-->
+<robot name="$(arg name)" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- 定义参数 -->
+    <xacro:arg name="tf_prefix" default=""/>
+    <xacro:arg name="name" default="cs625"/>
+
+    <!-- 规划组 -->
+    <group name="cs625_arm">
+        <chain base_link="base_link" tip_link="my_end_effector_link"/>
+    </group>
+
+    <!-- 组状态 -->
+    <group_state name="home" group="cs625_arm">
+        <joint name="elbow_joint" value="0"/>
+        <joint name="shoulder_lift_joint" value="0"/>
+        <joint name="shoulder_pan_joint" value="0"/>
+        <joint name="wrist_1_joint" value="0"/>
+        <joint name="wrist_2_joint" value="0"/>
+        <joint name="wrist_3_joint" value="0"/>
+    </group_state>
+
+    <!-- 虚拟关节 -->
+    <virtual_joint name="virtual_joint" type="fixed" parent_frame="world" child_link="base_link"/>
+    
+    <!-- 碰撞禁用规则 -->
+    <disable_collisions link1="base_link_inertia" link2="shoulder_link" reason="Adjacent"/>
+    <disable_collisions link1="base_link_inertia" link2="upperarm_link" reason="Never"/>
+    <disable_collisions link1="forearm_link" link2="upperarm_link" reason="Adjacent"/>
+    <disable_collisions link1="forearm_link" link2="wrist_1_link" reason="Adjacent"/>
+    <disable_collisions link1="my_end_effector_link" link2="wrist_1_link" reason="Never"/>
+    <disable_collisions link1="my_end_effector_link" link2="wrist_2_link" reason="Never"/>
+    <disable_collisions link1="my_end_effector_link" link2="wrist_3_link" reason="Adjacent"/>
+    <disable_collisions link1="shoulder_link" link2="upperarm_link" reason="Adjacent"/>
+    <disable_collisions link1="shoulder_link" link2="wrist_1_link" reason="Never"/>
+    <disable_collisions link1="wrist_1_link" link2="wrist_2_link" reason="Adjacent"/>
+    <disable_collisions link1="wrist_2_link" link2="wrist_3_link" reason="Adjacent"/>
+</robot>

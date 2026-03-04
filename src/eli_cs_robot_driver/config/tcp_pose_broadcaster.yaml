@@ -1,0 +1,4 @@
+tcp_pose_broadcaster:
+  ros__parameters:
+    frame_id: "base"
+    pose_name: "tcp_pose"

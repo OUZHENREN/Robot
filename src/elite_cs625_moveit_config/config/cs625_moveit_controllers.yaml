@@ -1,0 +1,26 @@
+# This file is loaded by move_group via MoveItConfigsBuilder.
+# It configures both trajectory execution parameters and the simple controller manager.
+
+trajectory_execution:
+  moveit_manage_controllers: true
+  allowed_execution_duration_scaling: 1.2
+  allowed_goal_duration_margin: 0.5
+  allowed_start_tolerance: 0.01
+
+moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+
+moveit_simple_controller_manager:
+  controller_names:
+    - arm_controller
+
+  arm_controller:
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory  # Namespace of the FollowJointTrajectory action
+    default: true
+    joints:  # Informational for MoveIt; ros2_control joints are defined in cs625_controllers.yaml
+      - shoulder_pan_joint
+      - shoulder_lift_joint
+      - elbow_joint
+      - wrist_1_joint
+      - wrist_2_joint
+      - wrist_3_joint

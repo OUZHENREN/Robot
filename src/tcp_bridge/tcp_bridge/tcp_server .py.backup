@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+
+import socket
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+
+class TCPServer(Node):
+    """
+    一个TCP服务器，接收外部数据并通过ROS 2话题发布。
+    """
+    def __init__(self, node_name='tcp_server'):
+        super().__init__(node_name)
+        
+        # --- ROS 2 相关设置 ---
+        # 创建一个发布者，将接收到的原始字符串发布到 'tcp_data' 话题
+        self.publisher_ = self.create_publisher(String, 'tcp_data', 10)
+        self.get_logger().info('ROS 2 Publisher on "tcp_data" topic is ready.')
+
+        # --- TCP/IP 服务器相关设置 ---
+        self.host = '0.0.0.0'  # 监听所有可用的网络接口
+        self.port = 9999         # 监听的端口号
+        
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # 设置SO_REUSEADDR选项，允许服务器立即重用端口
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        
+        try:
+            self.server_socket.bind((self.host, self.port))
+        except socket.error as e:
+            self.get_logger().error(f"Socket binding failed: {e}")
+            rclpy.shutdown()
+            return
+
+    def listen_for_clients(self):
+        """
+        主循环，用于监听和处理客户端连接。
+        """
+        self.server_socket.listen(1) # 只允许一个客户端连接排队
+        self.get_logger().info(f"TCP Server listening on ({self.host}, {self.port})...")
+        
+        while rclpy.ok():
+            try:
+                # 等待客户端连接
+                conn, addr = self.server_socket.accept()
+                self.get_logger().info(f"Got a connection from {addr}")
+                
+                with conn:
+                    while rclpy.ok():
+                        # 接收数据
+                        data = conn.recv(1024) # 每次最多接收1024字节
+                        if not data:
+                            # 如果接收到空数据，表示客户端已断开
+                            self.get_logger().warn(f"Client {addr} disconnected.")
+                            break
+                        
+                        # 将接收到的字节解码为字符串，并去除首尾的空白字符
+                        received_str = data.decode('utf-8').strip()
+                        self.get_logger().info(f"Received data: '{received_str}'")
+                        
+                        # 创建一个ROS消息并发布
+                        msg = String()
+                        msg.data = received_str
+                        self.publisher_.publish(msg)
+                        
+            except KeyboardInterrupt:
+                self.get_logger().info("Server is shutting down by user request (Ctrl+C).")
+                break
+            except Exception as e:
+                self.get_logger().error(f"An error occurred in the main loop: {e}")
+                # 在出现错误时短暂等待，避免CPU占用率过高
+                import time
+                time.sleep(1)
+
+    def destroy_node(self):
+        self.get_logger().info("Closing server socket.")
+        self.server_socket.close()
+        super().destroy_node()
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    
+    tcp_server_node = TCPServer()
+    
+    try:
+        # 运行服务器的主循环
+        tcp_server_node.listen_for_clients()
+    finally:
+        #确保在程序退出时资源被正确释放
+        tcp_server_node.destroy_node()
+        rclpy.shutdown()
+
+# 这是Python脚本的入口点。当直接运行此文件时，将执行main()函数。
+if __name__ == '__main__':
+    main()
+

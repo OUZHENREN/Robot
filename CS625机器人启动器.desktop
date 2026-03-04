@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=CS625机器人启动器
+Comment=ELI CS625工业机器人可视化系统
+Exec=/bin/bash -c "$HOME/elite_ros_ws/cs625_launcher.sh"
+Icon=application-x-executable
+Terminal=true
+StartupNotify=true
+Categories=Development;Robotics;

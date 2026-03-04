@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<library path="elite_io_rviz_plugin">
+  <class
+    name="elite_io_rviz_plugin/IOControlPanel"
+    type="elite_io_rviz_plugin::IOControlPanel"
+    base_class_type="rviz_common::Panel">
+    <description>
+      IO control panel for Elite tool digital outputs (T0, T1).
+    </description>
+  </class>
+</library>

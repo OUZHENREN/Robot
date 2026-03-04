@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor-specific
+*~
+.swp
+.swo
+
+# ROS build artifacts (although they should be outside src)
+build/
+install/
+log/
+
+# Other
+.DS_Store
+Thumbs.db

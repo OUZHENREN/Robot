@@ -1,0 +1,39 @@
+# joint_limits.yaml
+# 已修改：开启加速度限制，并根据机器人的安全模式（500mm/s, 400ms停止）设定了具体数值。
+
+# 将默认缩放因子设为 1.0，因为我们在下方已经定义了严格的安全上限，不需要再次缩小。
+default_velocity_scaling_factor: 1.0
+default_acceleration_scaling_factor: 1.0
+
+# 具体的关节限制
+joint_limits:
+  shoulder_pan_joint:
+    has_velocity_limits: true
+    max_velocity: 1.5           # 约85°/s，适配 500mm/s 工具速度
+    has_acceleration_limits: true
+    max_acceleration: 2.5       # 适配 400ms 停止时间
+  shoulder_lift_joint:
+    has_velocity_limits: true
+    max_velocity: 1.5
+    has_acceleration_limits: true
+    max_acceleration: 2.5
+  elbow_joint:
+    has_velocity_limits: true
+    max_velocity: 1.5
+    has_acceleration_limits: true
+    max_acceleration: 2.5
+  wrist_1_joint:
+    has_velocity_limits: true
+    max_velocity: 1.5
+    has_acceleration_limits: true
+    max_acceleration: 2.5
+  wrist_2_joint:
+    has_velocity_limits: true
+    max_velocity: 1.5
+    has_acceleration_limits: true
+    max_acceleration: 2.5
+  wrist_3_joint:
+    has_velocity_limits: true
+    max_velocity: 1.5
+    has_acceleration_limits: true
+    max_acceleration: 2.5

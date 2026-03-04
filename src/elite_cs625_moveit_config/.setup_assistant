@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: eli_cs_robot_description
+    relative_path: urdf/cs625_for_moveit.urdf
+  srdf:
+    relative_path: config/cs625.srdf
+  package_settings:
+    author_name: yff
+    author_email: 1933825889@qq.com
+    generated_timestamp: 1772249009

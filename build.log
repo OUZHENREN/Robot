@@ -1,0 +1,27 @@
+Starting >>> eli_cs_robot_description
+Starting >>> eli_common_interface
+Starting >>> eli_dashboard_interface
+Starting >>> cs625_full_system
+Finished <<< cs625_full_system [0.85s]
+Starting >>> eli_cs_robot_calibration
+Finished <<< eli_cs_robot_description [1.87s]
+Starting >>> model_visualizer
+Finished <<< eli_cs_robot_calibration [1.13s]
+Starting >>> tcp_bridge
+Finished <<< model_visualizer [0.92s]
+Starting >>> vision_bridge
+Finished <<< tcp_bridge [0.96s]
+Starting >>> eli_cs_robot_simulation_gz
+Finished <<< eli_cs_robot_simulation_gz [1.45s]
+Starting >>> elite_cs625_moveit_config
+Finished <<< elite_cs625_moveit_config [1.91s]
+Finished <<< eli_dashboard_interface [11.0s]
+Finished <<< vision_bridge [10.1s]
+Finished <<< eli_common_interface [15.0s]
+Starting >>> eli_cs_controllers
+Starting >>> eli_cs_robot_driver
+Finished <<< eli_cs_controllers [16.2s]
+Finished <<< eli_cs_robot_driver [19.8s]
+
+Summary: 12 packages finished [34.9s]
+  1 package had stderr output: eli_cs_robot_driver

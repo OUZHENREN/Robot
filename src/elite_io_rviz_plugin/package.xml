@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>elite_io_rviz_plugin</name>
+  <version>0.0.1</version>
+  <description>RViz panel plugin to control Elite robot tool digital outputs.</description>
+
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>rviz_common</depend>
+  <depend>pluginlib</depend>
+  <depend>eli_common_interface</depend>
+
+  <exec_depend>qtbase5-dev</exec_depend>
+
+  <export>
+    <rviz_common plugin="${prefix}/share/elite_io_rviz_plugin/plugin_description.xml"/>
+  </export>
+</package>

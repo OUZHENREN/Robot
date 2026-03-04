@@ -1,0 +1,13 @@
+[INFO] [launch]: All log files can be found below /home/yff/.ros/log/2026-01-16-19-47-42-169536-yff-VMware-Virtual-Platform-63366
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [robot_state_publisher-1]: process started with pid [63371]
+[INFO] [joint_state_publisher_gui-2]: process started with pid [63372]
+[INFO] [rviz2-3]: process started with pid [63373]
+[robot_state_publisher-1] [INFO] [1768564062.342686829] [robot_state_publisher]: Robot initialized
+[rviz2-3] [INFO] [1768564062.488541922] [rviz2]: Stereo is NOT SUPPORTED
+[rviz2-3] [INFO] [1768564062.488671188] [rviz2]: OpenGl version: 4.3 (GLSL 4.3)
+[rviz2-3] [INFO] [1768564062.503938195] [rviz2]: Stereo is NOT SUPPORTED
+[joint_state_publisher_gui-2] QSocketNotifier: Can only be used with threads started with QThread
+[joint_state_publisher_gui-2] [INFO] [1768564062.660205346] [joint_state_publisher_gui]: Waiting for robot_description to be published on the robot_description topic...
+[joint_state_publisher_gui-2] [INFO] [1768564062.665617592] [joint_state_publisher_gui]: Centering
+[joint_state_publisher_gui-2] [INFO] [1768564062.816006259] [joint_state_publisher_gui]: Centering
