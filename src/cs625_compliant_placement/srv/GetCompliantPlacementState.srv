@@ -1,0 +1,4 @@
+---
+bool success
+string message
+cs625_compliant_placement/CompliantPlacementState state

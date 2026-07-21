@@ -11,13 +11,25 @@ setup(
     version='0.1.0',
     packages=find_packages(exclude=['test']),
     data_files=[
-        ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
-        ('share/' + package_name, ['package.xml']),
-        # 关键：安装 launch 目录下的所有 .py 文件
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
+        (
+            'share/ament_index/resource_index/packages',
+            ['resource/' + package_name]
+        ),
+        (
+            'share/' + package_name,
+            ['package.xml']
+        ),
+        # 安装 launch 目录下的所有 .py 文件
+        (
+            os.path.join('share', package_name, 'launch'),
+            glob('launch/*.py')
+        ),
     ],
-    install_requires=['setuptools', 'scipy'],  # 明确需要scipy
+    install_requires=[
+        'setuptools',
+        'scipy',
+        'trimesh',
+    ],
     zip_safe=True,
     maintainer='yff',
     maintainer_email='yff@todo.todo',
@@ -30,12 +42,21 @@ setup(
             'tcp_server = tcp_bridge.tcp_server:main',
             'robot_commander = tcp_bridge.robot_commander:main',
 
-            # GLB模型显示节点
+            # GLB 模型显示节点
             'static_model_publisher = tcp_bridge.static_model_publisher:main',
+
+            # 抓取后 attached 的 box 外观模型显示节点
+            'attached_box_visual_publisher = tcp_bridge.attached_box_visual_publisher:main',
+
+            # STL 碰撞模型发布节点
+            'collision_object_publisher = tcp_bridge.collision_object_publisher:main',
 
             # 辅助与测试节点
             'pose_to_tf_broadcaster = tcp_bridge.pose_to_tf_broadcaster:main',
             'pose_sender_node = tcp_bridge.pose_sender_node:main',
+
+            # 你的采样脚本（注意：模块名是 tcp_bridge.sample_collector_tf）
+            'sample_collector_tf = tcp_bridge.sample_collector_tf:main',
         ],
     },
 )

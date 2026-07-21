@@ -1,33 +1,35 @@
 #!/bin/bash
-# CS625机器人启动脚本 - 自动切换到正确目录
 
-WORKSPACE_DIR="$HOME/elite_ros_ws"
+gnome-terminal -- bash -lc '
+set -e
+cd /home/yff/elite_ros_ws
 
-# 检查工作空间是否存在
-if [ ! -d "$WORKSPACE_DIR" ]; then
-    echo "错误: 工作空间目录不存在: $WORKSPACE_DIR"
-    exit 1
-fi
-# 创建一个在任何位置都能运行的包装脚本
-cat > start_cs625.sh << 'EOF'
-#!/bin/bash
-# CS625机器人启动脚本 - 自动切换到正确目录
+# 1. 先 source ROS2
+source /opt/ros/jazzy/setup.bash
 
-WORKSPACE_DIR="$HOME/elite_ros_ws"
+# 2. 再 source 工作区
+source /home/yff/elite_ros_ws/install/setup.bash
 
-# 检查工作空间是否存在
-if [ ! -d "$WORKSPACE_DIR" ]; then
-    echo "错误: 工作空间目录不存在: $WORKSPACE_DIR"
-    exit 1
-fi
+# 3. 显式把 rviz 插件两个包加入 AMENT_PREFIX_PATH（如果不在的话）
+export AMENT_PREFIX_PATH=/home/yff/elite_ros_ws/install/elite_io_rviz_plugin:/home/yff/elite_ros_ws/install/elite_dashboard_rviz_plugin:$AMENT_PREFIX_PATH
 
-# 切换到工作空间目录
-cd "$WORKSPACE_DIR"
-# 检查脚本是否存在
-if [ ! -f "cs625_wizard_fixed.sh" ]; then
-    echo "错误: 未找到启动向导脚本"
-    echo "请在 $WORKSPACE_DIR 目录中创建脚本"
-    exit 1
-fi
-# 运行向导
-./cs625_wizard_fixed.sh
+echo "===== 桌面启动环境（强制补全版）====="
+echo "AMENT_PREFIX_PATH=$AMENT_PREFIX_PATH"
+echo "CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH"
+
+# 4. 启动 launch
+ros2 launch cs625_full_system cs625_full_system.launch.py \
+  robot_ip:=192.168.1.200 \
+  cs_type:=cs625 \
+  headless_mode:=true \
+  use_fake_hardware:=false \
+  launch_rviz:=true \
+  safety_limits:=false \
+  fake_sensor_commands:=false \
+  use_tool_communication:=false \
+  local_ip:=192.168.1.102
+
+echo
+echo "========== 启动结束或被中断，按 Enter 关闭窗口 =========="
+read
+'

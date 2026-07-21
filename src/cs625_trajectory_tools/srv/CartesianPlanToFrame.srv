@@ -1,0 +1,8 @@
+# Request
+string frame_id
+
+---
+# Response
+bool success
+string message
+float64 fraction

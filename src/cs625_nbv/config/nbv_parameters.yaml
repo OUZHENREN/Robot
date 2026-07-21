@@ -1,0 +1,43 @@
+# PoseGain-NBV Parameters
+# All tunable parameters for the cs625_nbv package.
+
+cs625_nbv:
+  ros__parameters:
+    # ---- Viewpoint sampling ----
+    view_distance: 0.5             # meters, camera-to-target distance
+    sample_count: 42               # Fibonacci sphere sample count
+    camera_fov_h: 1.047            # radians (60 degrees)
+    camera_fov_v: 0.785            # radians (45 degrees)
+    camera_min_range: 0.05
+    camera_max_range: 5.0
+
+    # ---- Information gain ----
+    weight_translation_x: 1.0      # W matrix: translation
+    weight_translation_y: 1.0
+    weight_translation_z: 1.0
+    weight_rotation_x: 0.5         # W matrix: rotation
+    weight_rotation_y: 0.5
+    weight_rotation_z: 0.5
+
+    # ---- Utility scoring ----
+    L0: 1.0                        # Path length normalization (m)
+    tau_0: 5.0                     # Planning time normalization (s)
+    lambda_tau: 0.3                # Time cost weight
+
+    # ---- Bootstrap covariance ----
+    K: 30                          # Number of perturbation samples
+    translation_noise: 0.005       # meters std
+    rotation_noise: 0.02           # radians std
+    icp_max_iterations: 50
+    icp_max_correspondence_distance: 0.05
+
+    # ---- Stop criteria ----
+    translation_threshold: 0.003   # meters (3mm)
+    rotation_threshold_deg: 2.0    # degrees
+    marginal_gain_threshold: 0.05  # 5% relative
+    max_views: 6                   # Maximum views per episode
+
+    # ---- Experiment logging ----
+    log_base_dir: "~/nbv_experiments"
+    save_clouds: true
+    save_covariance: true

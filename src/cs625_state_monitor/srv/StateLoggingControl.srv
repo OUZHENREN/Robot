@@ -1,0 +1,4 @@
+string command   # "start" | "pause" | "stop"
+---
+bool success
+string message

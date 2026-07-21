@@ -1,0 +1,12 @@
+float64 target_tcp_x_mm
+float64 target_tcp_y_mm
+float64 target_tcp_z_mm
+
+float64 target_tolerance_mm
+
+bool use_force_contact
+bool use_jam_detection
+
+---
+bool success
+string message

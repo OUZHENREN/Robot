@@ -1,0 +1,9 @@
+cs625_compliant_placement_node:
+  ros__parameters:
+    control_rate_hz: 50.0
+
+    contact_alpha: 0.2
+    baseline_alpha: 0.01
+
+    raw_state_topic: "/cs625/raw_state"
+    state_topic: "/cs625/compliant_placement/state"

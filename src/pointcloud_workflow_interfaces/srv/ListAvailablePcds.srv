@@ -1,0 +1,5 @@
+---
+bool success
+string message
+string[] timestamp_dirs
+bool[] enabled

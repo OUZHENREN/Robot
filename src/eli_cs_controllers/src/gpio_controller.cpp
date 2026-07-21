@@ -412,26 +412,34 @@ bool GPIOController::setSpeedSlider(eli_common_interface::srv::SetSpeedSliderFra
     return true;
 }
 
-bool GPIOController::resendRobotControlScript(std_srvs::srv::Trigger::Request::SharedPtr /*req*/,
-                                        std_srvs::srv::Trigger::Response::SharedPtr resp) {
-    // reset success flag
+bool GPIOController::resendRobotControlScript(
+    std_srvs::srv::Trigger::Request::SharedPtr /*req*/,
+    std_srvs::srv::Trigger::Response::SharedPtr resp) {
     (void)command_interfaces_[(int)CommandOffset::RESEND_ROBOT_CONTROL_SCRIPT_SUCCESS].set_value(ASYNC_WAITING);
-    // call the service in the hardware
     (void)command_interfaces_[(int)CommandOffset::RESEND_ROBOT_CONTROL_SCRIPT].set_value(1.0);
 
     if (!waitForAsyncCommand(
-            [&]() { return command_interfaces_[(int)CommandOffset::RESEND_ROBOT_CONTROL_SCRIPT_SUCCESS].get_optional().value_or(0.0); })) {
+            [&]() {
+                return command_interfaces_[(int)CommandOffset::RESEND_ROBOT_CONTROL_SCRIPT_SUCCESS]
+                    .get_optional().value_or(0.0);
+            })) {
+        resp->success = false;
+        resp->message = "timeout waiting resend_external_script_async_success";
         RCLCPP_WARN(get_node()->get_logger(),
-                    "Could not verify that program was sent. (This might happen when using the "
-                    "mocked interface)");
+                    "Could not verify that program was sent.");
+        return true;
     }
-    resp->success = static_cast<bool>(command_interfaces_[(int)CommandOffset::RESEND_ROBOT_CONTROL_SCRIPT_SUCCESS].get_optional().value_or(0.0));
+
+    resp->success = static_cast<bool>(
+        command_interfaces_[(int)CommandOffset::RESEND_ROBOT_CONTROL_SCRIPT_SUCCESS]
+            .get_optional().value_or(0.0));
 
     if (resp->success) {
+        resp->message = "Successfully resent robot program";
         RCLCPP_INFO(get_node()->get_logger(), "Successfully resent robot program");
     } else {
+        resp->message = "Hardware interface reported sendExternalControlScript failure";
         RCLCPP_ERROR(get_node()->get_logger(), "Could not resend robot program");
-        return false;
     }
 
     return true;

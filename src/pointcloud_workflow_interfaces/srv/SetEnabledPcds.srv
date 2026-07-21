@@ -1,0 +1,5 @@
+string[] timestamp_dirs
+---
+bool success
+string message
+int32 enabled_count

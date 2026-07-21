@@ -1,0 +1,18 @@
+uint32 current_step
+string current_phase
+string status
+string exec_substate
+string box_state
+string load_state
+
+bool reached_box_grasp_tcp_pose
+bool io_double_low_confirmed
+bool operator_grasp_confirmed
+bool grasp_confirmed
+
+bool reached_slot_insert_tcp_pose
+bool io_double_high_confirmed
+bool operator_release_confirmed
+bool release_confirmed
+
+string last_message

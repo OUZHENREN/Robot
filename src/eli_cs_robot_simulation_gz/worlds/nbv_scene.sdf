@@ -1,0 +1,267 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <world name="nbv_world">
+
+    <!-- Scene broadcaster for communicating with ROS2 -->
+    <plugin name="sc_broadcaster" filename="ignition-gazebo-scene-broadcaster-system.so"/>
+
+    <!-- Physics -->
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Lighting -->
+    <light type="directional" name="sun">
+      <pose>0 0 10 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1.0</intensity>
+      <direction>-0.2 -0.2 -1.0</direction>
+      <diffuse>0.8 0.8 0.8 1.0</diffuse>
+      <specular>0.1 0.1 0.1 1.0</specular>
+    </light>
+
+    <!-- Ground plane -->
+    <model name="ground">
+      <static>true</static>
+      <link name="ground_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>4 4 0.02</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>4 4 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.4 0.4 0.4 1.0</ambient>
+            <diffuse>0.6 0.6 0.6 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+      <pose>0 0 -0.01 0 0 0</pose>
+    </model>
+
+    <!-- Table (0.8m height, as specified in project) -->
+    <model name="table">
+      <static>true</static>
+      <link name="table_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.2 0.8 0.04</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1.2 0.8 0.04</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 0.35 0.25 1.0</ambient>
+            <diffuse>0.7 0.5 0.35 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+      <!-- Position table in front of robot -->
+      <pose>0.5 0.3 0.4 0 0 0</pose>
+    </model>
+
+    <!-- Table legs -->
+    <model name="table_leg_1">
+      <static>true</static>
+      <link name="leg_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.78</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.78</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.3 0.2 0.15 1.0</ambient>
+            <diffuse>0.5 0.35 0.25 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+      <pose>0.05 -0.25 0.01 0 0 0</pose>
+    </model>
+    <model name="table_leg_2">
+      <static>true</static>
+      <link name="leg_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.78</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.78</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.3 0.2 0.15 1.0</ambient>
+            <diffuse>0.5 0.35 0.25 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+      <pose>0.95 -0.25 0.01 0 0 0</pose>
+    </model>
+    <model name="table_leg_3">
+      <static>true</static>
+      <link name="leg_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.78</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.78</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.3 0.2 0.15 1.0</ambient>
+            <diffuse>0.5 0.35 0.25 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+      <pose>0.05 0.55 0.01 0 0 0</pose>
+    </model>
+    <model name="table_leg_4">
+      <static>true</static>
+      <link name="leg_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.78</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.78</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.3 0.2 0.15 1.0</ambient>
+            <diffuse>0.5 0.35 0.25 1.0</diffuse>
+          </material>
+        </visual>
+      </link>
+      <pose>0.95 0.55 0.01 0 0 0</pose>
+    </model>
+
+    <!-- Target object (small box, 5cm cube, to be localized by NBV) -->
+    <model name="target_object">
+      <static>true</static>
+      <link name="target_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.8 0.2 0.2 1.0</ambient>
+            <diffuse>0.9 0.3 0.3 1.0</diffuse>
+            <specular>0.1 0.1 0.1 1.0</specular>
+          </material>
+        </visual>
+      </link>
+      <!-- Position target on the table surface -->
+      <pose>0.5 0.3 0.845 0 0 0</pose>
+    </model>
+
+    <!-- Occluder wall (blocks direct view from default robot position) -->
+    <model name="occluder_wall">
+      <static>true</static>
+      <link name="occluder_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.02 0.15 0.10</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.02 0.15 0.10</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.2 0.2 0.2 1.0</ambient>
+            <diffuse>0.3 0.3 0.3 1.0</diffuse>
+            <specular>0.05 0.05 0.05 1.0</specular>
+          </material>
+        </visual>
+      </link>
+      <!-- Occluder positioned between robot and target -->
+      <pose>0.35 0.3 0.845 0 0 0</pose>
+    </model>
+
+    <!-- Secondary occluder (side obstruction) -->
+    <model name="occluder_side">
+      <static>true</static>
+      <link name="occluder_side_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.12 0.02 0.10</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.12 0.02 0.10</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.25 0.25 0.25 1.0</ambient>
+            <diffuse>0.35 0.35 0.35 1.0</diffuse>
+            <specular>0.05 0.05 0.05 1.0</specular>
+          </material>
+        </visual>
+      </link>
+      <pose>0.5 0.18 0.845 0 0 0</pose>
+    </model>
+
+  </world>
+</sdf>

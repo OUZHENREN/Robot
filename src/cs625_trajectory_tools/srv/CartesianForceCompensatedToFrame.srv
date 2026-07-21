@@ -1,0 +1,7 @@
+string frame_id
+---
+bool success
+string message
+float64 completion_ratio
+uint32 compensation_count
+string dominant_axis

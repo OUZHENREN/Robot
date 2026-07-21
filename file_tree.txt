@@ -1,0 +1,363 @@
+.
+├── CS625机器人启动器.desktop
+├── README.md
+├── README.txt
+├── basic_test.sh
+├── build.log
+├── build_log.txt
+├── check_all_packages.sh
+├── check_calibration_target.sh
+├── check_driver_deps.sh
+├── check_header_path.sh
+├── check_launch_params.sh
+├── check_package.sh
+├── comprehensive_macro_fix.sh
+├── comprehensive_recovery.sh
+├── create_missing_files.sh
+├── cs625_launcher.desktop
+├── cs625_launcher.sh
+├── cs625_wizard.sh
+├── cs625_wizard_fixed.sh
+├── debug_urdf.sh
+├── deep_xacro_analysis.sh
+├── diagnose_model_loss.sh
+├── diagnose_project.sh
+├── diagnose_visualization.sh
+├── diagnose_workspace.sh
+├── direct_diagnose_fix.sh
+├── download_from_github.sh
+├── download_official_files.sh
+├── eli_cs_robot_usage_guide.sh
+├── file_tree.txt
+├── final_fix_scaled_controller.sh
+├── final_fixes.sh
+├── final_xacro_parameter_fix.sh
+├── find_official_repo.sh
+├── fix_all_issues.sh
+├── fix_all_setvalue_warnings.sh
+├── fix_calibration_config.sh
+├── fix_calibration_deps.sh
+├── fix_calibration_target.sh
+├── fix_controller_header.sh
+├── fix_cs625_direct.sh
+├── fix_cs625_robot.sh
+├── fix_get_state.sh
+├── fix_gpio_setvalue.sh
+├── fix_header.sh
+├── fix_header_spelling.sh
+├── fix_header_syntax.sh
+├── fix_headers.sh
+├── fix_implementation.sh
+├── fix_macro_issue.sh
+├── fix_macro_name.sh
+├── fix_ros2_jazzy_compatibility.sh
+├── fix_scaled_controller_cpp.sh
+├── fix_urdf_and_launch.sh
+├── fix_xacro_syntax.sh
+├── frames_2026-03-03_01.30.42.gv
+├── frames_2026-03-03_01.30.42.pdf
+├── frames_2026-03-03_01.39.44.gv
+├── frames_2026-03-03_01.39.44.pdf
+├── frames_2026-03-03_01.54.27.gv
+├── frames_2026-03-03_01.54.27.pdf
+├── frames_2026-03-03_02.01.22.gv
+├── frames_2026-03-03_02.01.22.pdf
+├── frames_2026-03-03_02.03.33.gv
+├── frames_2026-03-03_02.03.33.pdf
+├── frames_2026-03-03_02.17.58.gv
+├── frames_2026-03-03_02.17.58.pdf
+├── launch_cs625_direct.sh
+├── launch_full.log
+├── launch_log.txt
+├── model_check.sh
+├── professional_cs625.sh
+├── quick_fix_xacro.sh
+├── quick_start.sh
+├── quick_start_fixed.sh
+├── rebuild_workspace.sh
+├── restore_workspace.sh
+├── safe_scaled_controller.sh
+├── simple_solution.sh
+├── src
+│   ├── cs625_full_system
+│   │   ├── cs625_full_system
+│   │   │   └── __init__.py
+│   │   ├── launch
+│   │   │   ├── cs625_full_system.launch (backup).py
+│   │   │   └── cs625_full_system.launch.py
+│   │   ├── package.xml
+│   │   ├── resource
+│   │   │   └── cs625_full_system
+│   │   ├── setup.cfg
+│   │   ├── setup.py
+│   │   └── test
+│   │       ├── test_copyright.py
+│   │       ├── test_flake8.py
+│   │       └── test_pep257.py
+│   ├── eli_common_interface
+│   │   ├── CMakeLists.txt
+│   │   ├── Changelog.md
+│   │   ├── LICENSE
+│   │   ├── msg
+│   │   │   ├── Analog.msg
+│   │   │   ├── IOState.msg
+│   │   │   ├── RobotMode.msg
+│   │   │   ├── SafetyMode.msg
+│   │   │   ├── TaskStatus.msg
+│   │   │   └── ToolData.msg
+│   │   ├── package.xml
+│   │   └── srv
+│   │       ├── GetRobotMode.srv
+│   │       ├── GetSafetyMode.srv
+│   │       ├── GetTaskStatus.srv
+│   │       ├── SetIO.srv
+│   │       ├── SetPayload.srv
+│   │       └── SetSpeedSliderFraction.srv
+│   ├── eli_cs_controllers
+│   │   ├── CMakeLists.txt
+│   │   ├── Changelog.md
+│   │   ├── LICENSE
+│   │   ├── README.md
+│   │   ├── README_CN.md
+│   │   ├── controller_plugins.xml
+│   │   ├── doc
+│   │   │   ├── index.md
+│   │   │   └── index_cn.md
+│   │   ├── include
+│   │   │   └── eli_cs_controllers
+│   │   ├── package.xml
+│   │   └── src
+│   │       ├── freedrive_controller.cpp
+│   │       ├── freedrive_controller_parameters.yaml
+│   │       ├── gpio_controller.cpp
+│   │       ├── gpio_controller_parameters.yaml
+│   │       ├── scaled_joint_trajectory_controller.cpp
+│   │       ├── scaled_joint_trajectory_controller_parameters.yaml
+│   │       ├── speed_scaling_state_broadcaster.cpp
+│   │       └── speed_scaling_state_broadcaster_parameters.yaml
+│   ├── eli_cs_robot_calibration
+│   │   ├── CMakeLists.txt
+│   │   ├── CMakeLists.txt.backup
+│   │   ├── Changelog.md
+│   │   ├── include
+│   │   │   ├── cs_calibration
+│   │   │   └── eli_cs_robot_calibration
+│   │   ├── launch
+│   │   │   └── calibration_correction.launch.py
+│   │   ├── package.xml
+│   │   └── src
+│   │       ├── calibration.cpp
+│   │       ├── calibration_consumer.cpp
+│   │       ├── calibration_correction.cpp
+│   │       └── calibration_library.cpp
+│   ├── eli_cs_robot_description
+│   │   ├── CMakeLists.txt
+│   │   ├── Changelog.md
+│   │   ├── LICENSE
+│   │   ├── config
+│   │   │   ├── cs612
+│   │   │   ├── cs616
+│   │   │   ├── cs620
+│   │   │   ├── cs625
+│   │   │   ├── cs63
+│   │   │   ├── cs66
+│   │   │   └── initial_positions.yaml
+│   │   ├── launch
+│   │   │   └── view_cs.launch.py
+│   │   ├── meshes
+│   │   │   ├── cs612
+│   │   │   ├── cs616
+│   │   │   ├── cs620
+│   │   │   ├── cs625
+│   │   │   ├── cs63
+│   │   │   ├── cs66
+│   │   │   └── visual
+│   │   ├── package.xml
+│   │   ├── rviz
+│   │   │   └── view_robot.rviz
+│   │   ├── test
+│   │   │   ├── test_cs_urdf_xacro.py
+│   │   │   └── test_view_cs_launch.py
+│   │   └── urdf
+│   │       ├── cs.ros2_control.xacro
+│   │       ├── cs.urdf.xacro
+│   │       ├── cs625.urdf.xacro
+│   │       ├── cs625_for_moveit.urdf
+│   │       ├── cs625_generated.urdf
+│   │       ├── cs_macro.xacro
+│   │       └── inc
+│   ├── eli_cs_robot_driver
+│   │   ├── CMakeLists.txt
+│   │   ├── Changelog.md
+│   │   ├── ELITECOs
+│   │   │   └── ExternalControl-1.1.0.elico
+│   │   ├── LICENSE
+│   │   ├── README.md
+│   │   ├── README_CN.md
+│   │   ├── config
+│   │   │   ├── arm_controller.yaml
+│   │   │   ├── cs625_controllers.yaml
+│   │   │   ├── force_torque_sensor_broadcaster.yaml
+│   │   │   ├── forward_position_controller.yaml
+│   │   │   └── tcp_pose_broadcaster.yaml
+│   │   ├── doc
+│   │   │   ├── Driver-arch.drawio.png
+│   │   │   ├── ExternalControl-guide-en.pdf
+│   │   │   ├── ExternalControl-guide-zh.pdf
+│   │   │   ├── Usage.md
+│   │   │   └── Usage_CN.md
+│   │   ├── example
+│   │   │   ├── config
+│   │   │   ├── cpp
+│   │   │   └── python
+│   │   ├── hardware_interface_plugin.xml
+│   │   ├── include
+│   │   │   └── eli_cs_robot_driver
+│   │   ├── launch
+│   │   │   ├── __pycache__
+│   │   │   ├── cs625_driver.launch.py
+│   │   │   ├── elite_control.launch (backup).py
+│   │   │   ├── elite_control.launch.py
+│   │   │   └── elite_control.launch.py.bak
+│   │   ├── package.xml
+│   │   ├── resources
+│   │   │   ├── external_control.script
+│   │   │   ├── input_recipe.txt
+│   │   │   └── output_recipe.txt
+│   │   └── src
+│   │       ├── control_node.cpp
+│   │       ├── controller_stopper.cpp
+│   │       ├── controller_stopper_node.cpp
+│   │       ├── dashboard_client.cpp
+│   │       ├── hardware_interface.cpp
+│   │       ├── load_components.cpp
+│   │       └── script_node.cpp
+│   ├── eli_cs_robot_simulation_gz
+│   │   ├── CMakeLists.txt
+│   │   ├── Changelog.md
+│   │   ├── LICENSE
+│   │   ├── config
+│   │   │   ├── cs_controllers (backup).yaml
+│   │   │   └── cs_controllers.yaml
+│   │   ├── launch
+│   │   │   ├── cs_sim_control.launch (backup).py
+│   │   │   ├── cs_sim_control.launch.py
+│   │   │   ├── cs_sim_moveit.launch (backup).py
+│   │   │   └── cs_sim_moveit.launch.py
+│   │   ├── package.xml
+│   │   └── scripts
+│   │       └── gz_control.py
+│   ├── eli_dashboard_interface
+│   │   ├── CMakeLists.txt
+│   │   ├── Changelog.md
+│   │   ├── LICENSE
+│   │   ├── package.xml
+│   │   └── srv
+│   │       ├── CustomRequest.srv
+│   │       ├── IsSaved.srv
+│   │       ├── Load.srv
+│   │       ├── Log.srv
+│   │       └── Popup.srv
+│   ├── elite_cs625_moveit_config
+│   │   ├── CMakeLists.txt
+│   │   ├── config
+│   │   │   ├── cs625.srdf
+│   │   │   ├── cs625.srdf.xacro
+│   │   │   ├── cs625_moveit_controllers (backup).yaml
+│   │   │   ├── cs625_moveit_controllers.yaml
+│   │   │   ├── joint_limits.yaml
+│   │   │   ├── kinematics.yaml
+│   │   │   ├── moveit.rviz
+│   │   │   └── pilz_cartesian_limits.yaml
+│   │   ├── file_tree.txt
+│   │   ├── launch
+│   │   │   ├── cs625_moveit.launch.py
+│   │   │   ├── cs625_moveit_rviz.launch.py
+│   │   │   ├── demo.launch.py
+│   │   │   ├── integrated_demo.launch.py
+│   │   │   ├── move_group.launch (backup).py
+│   │   │   ├── move_group.launch.py
+│   │   │   ├── moveit_rviz.launch (backup).py
+│   │   │   ├── moveit_rviz.launch.py
+│   │   │   ├── rsp.launch.py
+│   │   │   ├── setup_assistant.launch.py
+│   │   │   ├── spawn_controllers.launch.py
+│   │   │   ├── static_virtual_joint_tfs.launch.py
+│   │   │   └── warehouse_db.launch.py
+│   │   └── package.xml
+│   ├── elite_dashboard_rviz_plugin
+│   │   ├── CMakeLists.txt
+│   │   ├── include
+│   │   │   └── elite_dashboard_rviz_plugin
+│   │   ├── package.xml
+│   │   ├── plugin_description.xml
+│   │   └── src
+│   │       └── elite_dashboard_panel.cpp
+│   ├── elite_io_rviz_plugin
+│   │   ├── CMakeLists.txt
+│   │   ├── include
+│   │   │   └── elite_io_rviz_plugin
+│   │   ├── package.xml
+│   │   ├── plugin_description.xml
+│   │   └── src
+│   │       └── io_control_panel.cpp
+│   ├── model_visualizer
+│   │   ├── launch
+│   │   │   └── display_model.launch.py
+│   │   ├── model_visualizer
+│   │   │   ├── __init__.py
+│   │   │   └── static_model_publisher.py
+│   │   ├── package.xml
+│   │   ├── resource
+│   │   │   └── model_visualizer
+│   │   ├── setup.cfg
+│   │   ├── setup.py
+│   │   └── test
+│   │       ├── test_copyright.py
+│   │       ├── test_flake8.py
+│   │       └── test_pep257.py
+│   ├── tcp_bridge
+│   │   ├── launch
+│   │   │   └── cs625_launcher.py
+│   │   ├── meshes
+│   │   │   ├── slot_pointcloud.glb
+│   │   │   └── tool0.STL
+│   │   ├── package.xml
+│   │   ├── resource
+│   │   │   └── tcp_bridge
+│   │   ├── setup.cfg
+│   │   ├── setup.py
+│   │   ├── tcp_bridge
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   ├── pose_sender_node.py
+│   │   │   ├── pose_to_tf_broadcaster.py
+│   │   │   ├── robot_commander.py
+│   │   │   ├── setup.cfg
+│   │   │   ├── static_model_publisher.py
+│   │   │   ├── tcp_server (Copy).py
+│   │   │   ├── tcp_server .py.backup
+│   │   │   └── tcp_server.py
+│   │   └── test
+│   │       ├── test_copyright.py
+│   │       ├── test_flake8.py
+│   │       └── test_pep257.py
+│   └── vision_bridge
+│       ├── CMakeLists.txt
+│       ├── package.xml
+│       └── src
+│           └── tcp_pose_receiver.cpp
+├── start_cs625.sh
+├── start_cs625_gui.sh
+├── start_cs625_robot.sh
+├── start_robot_system.sh
+├── start_without_xacro.sh
+├── tcp_pose:
+├── test_complete_workspace.sh
+├── test_power_on.py
+├── ultimate_cs625_fix.sh
+├── ultimate_fix.sh
+├── ultimate_recovery.sh
+└── undo_bad_fixes.sh
+
+87 directories, 274 files

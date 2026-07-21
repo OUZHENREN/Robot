@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>elite_dashboard_rviz_plugin</name>
+  <version>0.0.1</version>
+  <description>RViz dashboard panel for Elite robot</description>
+
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>rviz_common</depend>
+  <depend>pluginlib</depend>
+
+  <depend>eli_common_interface</depend>
+  <depend>eli_dashboard_interface</depend>
+  <depend>std_srvs</depend>
+
+  <depend>tf2_ros</depend>
+  <depend>tf2</depend>
+  <depend>tf2_geometry_msgs</depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>visualization_msgs</depend>
+
+  <depend>cs625_kinematics</depend>
+  <depend>cs625_trajectory_tools</depend>
+  <depend>cs625_task_manager</depend>
+  <depend>cs625_compliant_placement</depend>
+  <depend>cs625_state_monitor</depend>
+  <depend>pointcloud_workflow_interfaces</depend>
+
+  <exec_depend>qtbase5-dev</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+    <rviz_common plugin="${prefix}/share/elite_dashboard_rviz_plugin/plugin_description.xml"/>
+  </export>
+</package>

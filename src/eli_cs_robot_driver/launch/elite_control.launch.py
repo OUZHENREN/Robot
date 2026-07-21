@@ -1,7 +1,8 @@
 import os
 # Copyright 2023 Elite Robots
 # ... 版权声明略 ...
-
+from launch_ros.actions import ComposableNodeContainer
+from launch_ros.descriptions import ComposableNode
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterFile
 from launch_ros.substitutions import FindPackageShare
@@ -206,7 +207,8 @@ def launch_setup(context, *args, **kwargs):
             robot_description,
             ParameterFile(initial_joint_controllers, allow_substs=True),
         ],
-        output="screen",
+        output="log",
+        
         condition=IfCondition(use_fake_hardware),
     )
 
@@ -219,6 +221,7 @@ def launch_setup(context, *args, **kwargs):
             ParameterFile(initial_joint_controllers, allow_substs=True),
         ],
         output="screen",
+        
         condition=UnlessCondition(use_fake_hardware),
     )
 
@@ -227,13 +230,16 @@ def launch_setup(context, *args, **kwargs):
         executable="eli_components_loader",
         parameters=[{"robot_ip": robot_ip}],
         condition=UnlessCondition(use_fake_hardware),
+        output="log",
+        
     )
 
     controller_stopper_node = Node(
         package="eli_cs_robot_driver",
         executable="controller_stopper_node",
         name="controller_stopper",
-        output="screen",
+        output="log",
+        
         emulate_tty=True,
         condition=UnlessCondition(use_fake_hardware),
         parameters=[
@@ -254,8 +260,9 @@ def launch_setup(context, *args, **kwargs):
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        output="both",
+        output="log",
         parameters=[robot_description],
+        
     )
 
     rviz_node = Node(
@@ -265,6 +272,7 @@ def launch_setup(context, *args, **kwargs):
         name="rviz2",
         output="log",
         arguments=["-d", rviz_config_file],
+        
     )
 
     # =====================================================================
@@ -296,6 +304,8 @@ def launch_setup(context, *args, **kwargs):
                 *inactive_flags,
                 *extra_args,
             ],
+            output="log",
+            
         )
 
     controller_spawner_names = [
@@ -325,6 +335,8 @@ def launch_setup(context, *args, **kwargs):
             arm_controller_yaml,
         ],
         condition=IfCondition(activate_joint_controller),
+        output="log",
+        
     )
 
     initial_joint_controller_spawner_stopped = Node(
@@ -341,6 +353,31 @@ def launch_setup(context, *args, **kwargs):
             arm_controller_yaml,
         ],
         condition=UnlessCondition(activate_joint_controller),
+        output="log",
+        
+    )
+
+    # =====================================================================
+    # 5) DashboardClient 组件容器（新增）
+    # =====================================================================
+    dashboard_client_node = ComposableNode(
+        package='eli_cs_robot_driver',
+        plugin='ELITE_CS_ROBOT_ROS_DRIVER::DashboardClient',
+        name='dashboard_client',
+        parameters=[{
+            'robot_ip': robot_ip,  # 使用 launch 传入的 robot_ip
+        }],
+        # output='screen' 只对 Node 生效，ComposableNode 的输出由 container 控制
+    )
+
+    dashboard_container = ComposableNodeContainer(
+        name='dashboard_container',
+        namespace='',
+        package='rclcpp_components',
+        executable='component_container_mt',
+        composable_node_descriptions=[dashboard_client_node],
+        output='log',
+        
     )
 
     nodes_to_start = [
@@ -352,6 +389,7 @@ def launch_setup(context, *args, **kwargs):
         rviz_node,
         initial_joint_controller_spawner_stopped,
         initial_joint_controller_spawner_started,
+        dashboard_container,  # ← 新增这一行
     ] + controller_spawners
 
     return nodes_to_start

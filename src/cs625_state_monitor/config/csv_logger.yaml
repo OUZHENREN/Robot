@@ -1,0 +1,4 @@
+cs625_state_csv_logger_node:
+  ros__parameters:
+    output_dir: "/home/yff/cs625_data"
+    write_tool_target_when_missing: false

@@ -4,7 +4,7 @@ project(eli_cs_robot_simulation_gz)
 find_package(ament_cmake REQUIRED)
 find_package(rclpy REQUIRED)
 
-install(DIRECTORY config launch
+install(DIRECTORY config launch worlds
   DESTINATION share/${PROJECT_NAME}
 )
 

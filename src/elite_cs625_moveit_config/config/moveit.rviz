@@ -6,11 +6,9 @@ Panels:
       Expanded:
         - /Grid1/Line Style1
         - /MotionPlanning1/Scene Geometry1
-        - /MotionPlanning1/Scene Robot1
-        - /TF1
-        - /TF1/Frames1
+        - /RobotModel1
       Splitter Ratio: 0.5
-    Tree Height: 483
+    Tree Height: 331
   - Class: rviz_common/Help
     Name: Help
   - Class: rviz_common/Views
@@ -20,6 +18,20 @@ Panels:
     Splitter Ratio: 0.5
   - Class: elite_io_rviz_plugin/IOControlPanel
     Name: IOControlPanel
+  - Class: elite_dashboard_rviz_plugin/EliteDashboardPanel
+    Name: EliteDashboardPanel
+  - Class: elite_dashboard_rviz_plugin/TcpClientPanel
+    Name: TcpClientPanel
+  - Class: elite_dashboard_rviz_plugin/GoalPlannerPanel
+    Name: GoalPlannerPanel
+  - Class: elite_dashboard_rviz_plugin/TaskExecutionPanel
+    Name: TaskExecutionPanel
+  - Class: elite_dashboard_rviz_plugin/StateMonitorPanel
+    Name: StateMonitorPanel
+  - Class: elite_dashboard_rviz_plugin/PointCloudWorkflowPanel
+    Name: PointCloudWorkflowPanel
+  - Class: elite_dashboard_rviz_plugin/MultiConfigPlanningPanel
+    Name: MultiConfigPlanningPanel
 Visualization Manager:
   Class: ""
   Displays:
@@ -49,7 +61,7 @@ Visualization Manager:
       MoveIt_Allow_External_Program: false
       MoveIt_Allow_Replanning: false
       MoveIt_Allow_Sensor_Positioning: false
-      MoveIt_Planning_Attempts: 10
+      MoveIt_Planning_Attempts: 5
       MoveIt_Planning_Time: 5
       MoveIt_Use_Cartesian_Path: false
       MoveIt_Use_Constraint_Aware_IK: false
@@ -72,6 +84,66 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
+          base:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          base_link_inertia:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          forearm_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          ft_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          my_end_effector_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          shoulder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          upperarm_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          world:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          wrist_1_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          wrist_2_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          wrist_3_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
         Loop Animation: true
         Robot Alpha: 0.5
         Robot Color: 150; 50; 150
@@ -93,7 +165,7 @@ Visualization Manager:
         Colliding Link Color: 255; 0; 0
         Goal State Alpha: 1
         Goal State Color: 250; 128; 0
-        Interactive Marker Size: 0
+        Interactive Marker Size: 0.20000000298023224
         Joint Violation Color: 255; 0; 255
         Planning Group: cs625_arm
         Query Goal State: true
@@ -118,6 +190,66 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
+          base:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          base_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          base_link_inertia:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          flange:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          forearm_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          ft_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          my_end_effector_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          shoulder_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          upperarm_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          world:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          wrist_1_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          wrist_2_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          wrist_3_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
         Robot Alpha: 0.5
         Show Robot Collision: false
         Show Robot Visual: true
@@ -153,16 +285,179 @@ Visualization Manager:
       Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
-        All Enabled: true
+        All Enabled: false
+        base:
+          Value: false
+        base_link:
+          Value: false
+        base_link_inertia:
+          Value: false
+        flange:
+          Value: false
+        ft_frame:
+          Value: false
+        my_end_effector_link:
+          Value: true
+        preview_base:
+          Value: true
+        preview_base_link:
+          Value: true
+        preview_base_link_inertia:
+          Value: true
+        preview_flange:
+          Value: true
+        preview_ft_frame:
+          Value: true
+        preview_my_end_effector_link:
+          Value: true
+        preview_wrist_3_link:
+          Value: true
+        tcp_pose:
+          Value: true
+        world:
+          Value: false
+        wrist_3_link:
+          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
       Tree:
-        {}
+        world:
+          base_link:
+            base:
+              tcp_pose:
+                {}
+            base_link_inertia:
+              {}
+          preview_base_link:
+            preview_base:
+              {}
+            preview_base_link_inertia:
+              {}
       Update Interval: 0
       Value: true
+    - Class: rviz_default_plugins/Marker
+      Enabled: true
+      Name: Marker
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /visualization_marker
+      Value: true
+    - Alpha: 1
+      Arrow Length: 0
+      Axes Length: 0.10000000149011612
+      Axes Radius: 0.009999999776482582
+      Class: rviz_default_plugins/PoseArray
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.07000000029802322
+      Head Radius: 0.029999999329447746
+      Name: PoseArray
+      Shaft Length: 0.23000000417232513
+      Shaft Radius: 0.009999999776482582
+      Shape: Axes
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /workspace_pointcloud_sampler/preview_pose_array
+      Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
+      Description File: ""
+      Description Source: Topic
+      Description Topic:
+        Depth: 5
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /preview_robot_description
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        preview_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        preview_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        preview_base_link_inertia:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        preview_flange:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        preview_forearm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        preview_ft_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        preview_my_end_effector_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        preview_shoulder_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        preview_upperarm_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        preview_wrist_1_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        preview_wrist_2_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        preview_wrist_3_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        world:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+      Mass Properties:
+        Inertia: false
+        Mass: false
+      Name: RobotModel
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -189,30 +484,34 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 3.0487868785858154
+      Distance: 6.919949054718018
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.9919692277908325
-        Y: -0.060059208422899246
-        Z: 0.024602891877293587
+        X: 0.033229004591703415
+        Y: -0.13044685125350952
+        Z: 0.13764633238315582
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.33000001311302185
+      Pitch: 0.7399951815605164
       Target Frame: world
       Value: Orbit (rviz_default_plugins)
-      Yaw: 3.218839168548584
+      Yaw: 4.897006988525391
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 849
+  EliteDashboardPanel:
+    collapsed: false
+  GoalPlannerPanel:
+    collapsed: false
+  Height: 1214
   Help:
     collapsed: false
   Hide Left Dock: false
@@ -223,9 +522,19 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002b4000002f3fc0200000004fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004400fffffffc0000003f00000288000001b50100001efa000000010100000003fb0000000a005600690065007700730100000000ffffffff0000010000fffffffb000000100044006900730070006c0061007900730100000000ffffffff0000015600fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000000000002b4000001ee00fffffffb0000000800480065006c0070000000029a0000006e0000006f00fffffffb0000001c0049004f0043006f006e00740072006f006c00500061006e0065006c01000002cd000000650000006500ffffff00000482000002f300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  MultiConfigPlanningPanel:
+    collapsed: false
+  PointCloudWorkflowPanel:
+    collapsed: false
+  QMainWindow State: 000000ff00000000fd00000002000000000000020700000460fc0200000004fc0000003f000001f0000001f00100001efa000000030100000004fb0000002200530074006100740065004d006f006e00690074006f007200500061006e0065006c0100000000ffffffff0000014400fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000000ffffffff000001ee00fffffffb0000000a005600690065007700730100000000ffffffff0000010000fffffffb000000100044006900730070006c00610079007301000000000000021f0000015600fffffffc000002350000026a0000026a0100001efa000000010100000003fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000011800fffffffb000000200047006f0061006c0050006c0061006e006e0065007200500061006e0065006c0100000000ffffffff0000020700fffffffb0000001c0054006300700043006c00690065006e007400500061006e0065006c01000000000000021f0000011800fffffffb0000000800480065006c0070000000029a0000006e0000006f00fffffffb0000001c0049004f0043006f006e00740072006f006c00500061006e0065006c00000002cd000000650000006500ffffff000000010000024a00000460fc0200000001fc0000003f000004600000030e0100001efa000000000100000004fb0000002e0050006f0069006e00740043006c006f007500640057006f0072006b0066006c006f007700500061006e0065006c0100000000ffffffff0000024a00fffffffb00000024005400610073006b0045007800650063007500740069006f006e00500061006e0065006c0100000000ffffffff0000022300fffffffb000000260045006c00690074006500440061007300680062006f00610072006400500061006e0065006c0100000000ffffffff0000017c00fffffffb00000030004d0075006c007400690043006f006e0066006900670050006c0061006e006e0069006e006700500061006e0065006c0100000687000003370000022700ffffff000000200000046000000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  StateMonitorPanel:
+    collapsed: false
+  TaskExecutionPanel:
+    collapsed: false
+  TcpClientPanel:
+    collapsed: false
   Views:
     collapsed: false
-  Width: 1852
-  X: 66
-  Y: 32
+  Width: 1149
+  X: 367
+  Y: 47

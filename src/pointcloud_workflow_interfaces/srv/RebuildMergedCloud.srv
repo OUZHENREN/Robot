@@ -1,0 +1,6 @@
+---
+bool success
+string message
+int32 file_count
+int64 raw_points
+int64 processed_points

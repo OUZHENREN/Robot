@@ -1,0 +1,6 @@
+uint32 step_id
+string extra_param
+---
+bool accepted
+bool success
+string message

@@ -56,7 +56,7 @@ def generate_launch_description():
     description_file_arg = DeclareLaunchArgument(
         'description_file', default_value='cs625.urdf.xacro', description='Robot xacro or urdf filename')
     initial_joint_controller_arg = DeclareLaunchArgument(
-        'initial_joint_controller', default_value='arm_controller', description='Initial joint controller name')
+        'initial_joint_controller', default_value='joint_trajectory_controller', description='Initial joint controller name')
     activate_joint_controller_arg = DeclareLaunchArgument(
         'activate_joint_controller', default_value='true', description='Whether to activate controller automatically')
     launch_rviz_arg = DeclareLaunchArgument(

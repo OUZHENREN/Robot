@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://wiki.ros.org/xacro" name="$(arg name)">
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="cs625">
+
    <!-- robot name parameter -->
    <xacro:arg name="name" default="cs625"/>
    <!-- import main macro -->
@@ -7,7 +8,7 @@
 
    <!-- possible 'cs_type' values: cs63, cs66, cs612, cs616, cs620, cs625 -->
    <!-- the default value should raise an error in case this was called without defining the type -->
-   <xacro:arg name="cs_type" default="cs63"/>
+   <xacro:arg name="cs_type" default="cs625"/>
 
    <!-- parameters -->
    <xacro:arg name="tf_prefix" default="" />

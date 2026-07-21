@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<library path="elite_dashboard_rviz_plugin">
+  <class
+    name="elite_dashboard_rviz_plugin/EliteDashboardPanel"
+    type="elite_dashboard_rviz_plugin::EliteDashboardPanel"
+    base_class_type="rviz_common::Panel">
+    <description>
+      Dashboard panel for Elite robot: power, brake, one-click start, state and tool IO.
+    </description>
+  </class>
+
+  <class
+    name="elite_dashboard_rviz_plugin/TcpClientPanel"
+    type="elite_dashboard_rviz_plugin::TcpClientPanel"
+    base_class_type="rviz_common::Panel">
+    <description>
+      TCP Client Panel for sending T0~T3 / custom header messages
+    </description>
+  </class>
+
+  <class
+    name="elite_dashboard_rviz_plugin/GoalPlannerPanel"
+    type="elite_dashboard_rviz_plugin::GoalPlannerPanel"
+    base_class_type="rviz_common::Panel">
+    <description>
+      Goal Planner Panel for planning to TF frames via MoveIt
+    </description>
+  </class>
+
+  <class
+    name="elite_dashboard_rviz_plugin/TaskExecutionPanel"
+    type="elite_dashboard_rviz_plugin::TaskExecutionPanel"
+    base_class_type="rviz_common::Panel">
+    <description>
+      Task execution panel for ordered execution-stage workflow UI.
+    </description>
+  </class>
+
+  <class
+    name="elite_dashboard_rviz_plugin/StateMonitorPanel"
+    type="elite_dashboard_rviz_plugin::StateMonitorPanel"
+    base_class_type="rviz_common::Panel">
+    <description>
+      State monitor panel to control CSV recording (start/pause/stop) and show realtime TCP data.
+    </description>
+  </class>
+
+  <class
+    name="elite_dashboard_rviz_plugin/PointCloudWorkflowPanel"
+    type="elite_dashboard_rviz_plugin::PointCloudWorkflowPanel"
+    base_class_type="rviz_common::Panel">
+    <description>
+      Point cloud workflow panel for sampler and merged environment point cloud control.
+    </description>
+  </class>
+
+  <class
+    name="elite_dashboard_rviz_plugin/MultiConfigPlanningPanel"
+    type="elite_dashboard_rviz_plugin::MultiConfigPlanningPanel"
+    base_class_type="rviz_common::Panel">
+    <description>
+      Multi-config IK selection and planning panel for CS625.
+    </description>
+  </class>
+</library>

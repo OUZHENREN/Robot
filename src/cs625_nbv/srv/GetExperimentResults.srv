@@ -1,0 +1,7 @@
+# Request the last N experiment results
+int32 count                   # How many recent results to retrieve (0 = all)
+string filter_strategy        # Optional filter by strategy name (empty = all)
+---
+# Response
+bool success
+cs625_nbv/EpisodeResult[] results

@@ -1,0 +1,20 @@
+[2026-03-28 22:28:19] Sync service started
+[2026-03-28 22:28:19] Source: /home/yff/environment_point_cloud_fusion
+[2026-03-28 22:28:19] Dest:   /mnt/hgfs/Model/environment_point_cloud_fusion
+sending incremental file list
+./
+test_sync.pcd
+
+sent 166 bytes  received 41 bytes  414.00 bytes/sec
+total size is 2,426,739  speedup is 11,723.38
+[2026-03-28 22:28:19] Initial sync completed
+[2026-03-28 23:04:31] Sync service started
+[2026-03-28 23:04:31] Source: /home/yff/environment_point_cloud_fusion
+[2026-03-28 23:04:31] Dest:   /mnt/hgfs/Model/environment_point_cloud_fusion
+sending incremental file list
+./
+environment_point_cloud.pcd
+
+sent 774,786 bytes  received 38 bytes  1,549,648.00 bytes/sec
+total size is 774,460  speedup is 1.00
+[2026-03-28 23:04:31] Initial sync completed

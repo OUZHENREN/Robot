@@ -1,0 +1,5 @@
+geometry_msgs/PoseStamped current_tcp
+---
+int32 index
+geometry_msgs/PoseStamped nearest_pose
+float64 distance

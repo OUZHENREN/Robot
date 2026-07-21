@@ -1,0 +1,8 @@
+---
+bool success
+string message
+string state
+int32 current_index
+int32 total_count
+bool running
+bool stop_requested

@@ -359,12 +359,17 @@ hardware_interface::CallbackReturn EliteCSPositionHardwareInterface::on_configur
     // Specify gain for servoing to position in joint space.
     // A higher gain can sharpen the trajectory.
     const int servoj_gain = stoi(info_.hardware_parameters["servoj_gain"]);
-    // Specify lookahead time for servoing to position in joint space.
-    // A longer lookahead time can smooth the trajectory.
     const double servoj_lookahead_time = stod(info_.hardware_parameters["servoj_lookahead_time"]);
-    // Time of servoj run
     const double servoj_time = stod(info_.hardware_parameters["servoj_time"]);
 
+    const double servoj_extrapolate_max_time =
+        stod(info_.hardware_parameters["servoj_extrapolate_max_time"]);
+    const double servoj_decelerate_time =
+        stod(info_.hardware_parameters["servoj_decelerate_time"]);
+    const double servoj_hold_velocity_threshold =
+        stod(info_.hardware_parameters["servoj_hold_velocity_threshold"]);
+    const double servoj_hold_stable_time =
+        stod(info_.hardware_parameters["servoj_hold_stable_time"]);
     // const bool use_tool_communication = (info_.hardware_parameters["use_tool_communication"] == "true") ||
     //                                     (info_.hardware_parameters["use_tool_communication"] == "True");
 
@@ -390,6 +395,11 @@ hardware_interface::CallbackReturn EliteCSPositionHardwareInterface::on_configur
         driver_config_.servoj_time = servoj_time;
         driver_config_.servoj_lookahead_time = servoj_lookahead_time;
         driver_config_.servoj_gain = servoj_gain;
+
+        driver_config_.servoj_extrapolate_max_time = servoj_extrapolate_max_time;
+        driver_config_.servoj_decelerate_time = servoj_decelerate_time;
+        driver_config_.servoj_hold_velocity_threshold = servoj_hold_velocity_threshold;
+        driver_config_.servoj_hold_stable_time = servoj_hold_stable_time;
         eli_driver_ = std::make_unique<ELITE::EliteDriver>(driver_config_);
     } catch (ELITE::EliteException& e) {
         RCLCPP_FATAL_STREAM(rclcpp::get_logger("EliteCSPositionHardwareInterface"), e.what());
@@ -565,7 +575,7 @@ hardware_interface::return_type EliteCSPositionHardwareInterface::write(const rc
     // If there is no interpreting task running on the robot, we do not want to send anything.
     if (runtime_state_ == ELITE::TaskStatus::PLAYING && is_robot_connected_) {
         if (position_controller_running_) {
-            eli_driver_->writeServoj(position_commands_, recv_timeout_ * 1000, false, false);
+            eli_driver_->writeServoj(position_commands_, static_cast<int>(recv_timeout_ * 1000), false);
 
         } else if (velocity_controller_running_) {
             eli_driver_->writeSpeedj(velocity_commands_, recv_timeout_ * 1000);
@@ -727,15 +737,40 @@ void EliteCSPositionHardwareInterface::updateAsyncIO() {
 
     if (!std::isnan(resend_external_script_cmd_) && eli_driver_ != nullptr) {
         try {
-            eli_driver_->sendScript("stop task\n");
-            while (runtime_state_ != ELITE::TaskStatus::STOPPED) {
+            RCLCPP_INFO(rclcpp::get_logger("EliteCSPositionHardwareInterface"),
+                        "resend_external_script triggered, runtime_state=%d, is_robot_connected=%d",
+                        static_cast<int>(runtime_state_), static_cast<int>(is_robot_connected_));
+    
+            resend_external_script_async_success_ = false;
+    
+            bool stop_ok = eli_driver_->sendScript("stop task\n");
+            RCLCPP_INFO(rclcpp::get_logger("EliteCSPositionHardwareInterface"),
+                        "stop task sent, result=%d", static_cast<int>(stop_ok));
+    
+            int wait_count = 0;
+            while (runtime_state_ != ELITE::TaskStatus::STOPPED && wait_count < 5000) {
                 std::this_thread::sleep_for(1ms);
+                wait_count++;
             }
-            resend_external_script_async_success_ = eli_driver_->sendExternalControlScript();
-            RCLCPP_INFO(rclcpp::get_logger("EliteCSPositionHardwareInterface"), "Send external control: %s",
-                        resend_external_script_async_success_ ? "success" : "fail");
+
+            RCLCPP_INFO(rclcpp::get_logger("EliteCSPositionHardwareInterface"),
+                        "after stop wait: runtime_state=%d, wait_count=%d",
+                        static_cast<int>(runtime_state_), wait_count);
+    
+            if (runtime_state_ != ELITE::TaskStatus::STOPPED) {
+                RCLCPP_ERROR(rclcpp::get_logger("EliteCSPositionHardwareInterface"),
+                             "resend_external_script failed: runtime_state did not reach STOPPED");
+                resend_external_script_async_success_ = false;
+            } else {
+                resend_external_script_async_success_ = eli_driver_->sendExternalControlScript();
+                RCLCPP_INFO(rclcpp::get_logger("EliteCSPositionHardwareInterface"),
+                            "sendExternalControlScript result=%d",
+                            static_cast<int>(resend_external_script_async_success_));
+            }
         } catch (const ELITE::EliteException& e) {
-            RCLCPP_ERROR(rclcpp::get_logger("EliteCSPositionHardwareInterface"), "Service Call failed: '%s'", e.what());
+            resend_external_script_async_success_ = false;
+            RCLCPP_ERROR(rclcpp::get_logger("EliteCSPositionHardwareInterface"),
+                         "Service Call failed: '%s'", e.what());
         }
         resend_external_script_cmd_ = NO_NEW_CMD;
     }

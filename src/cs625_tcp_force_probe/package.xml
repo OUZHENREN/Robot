@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>cs625_tcp_force_probe</name>
+  <version>0.0.1</version>
+  <description>Bridge and decision node for CS625 TCP force data based on driver topics</description>
+
+  <maintainer email="yff@example.com">yff</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

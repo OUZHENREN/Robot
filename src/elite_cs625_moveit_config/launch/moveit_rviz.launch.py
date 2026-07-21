@@ -32,7 +32,7 @@ def launch_setup(context, *args, **kwargs):
     )
 
     rviz_config_file = os.path.join(
-        get_package_share_directory("elite_cs625_moveit_config"), "config", "moveit.rviz"
+        get_package_share_directory("elite_cs625_moveit_config"), "config", "moveit_2k.rviz"
     )
     rviz_node = Node(
         package="rviz2",
@@ -41,6 +41,7 @@ def launch_setup(context, *args, **kwargs):
         output="log",
         arguments=["-d", rviz_config_file],
         parameters=[moveit_config.to_dict()],
+        
     )
     return [rviz_node]
 

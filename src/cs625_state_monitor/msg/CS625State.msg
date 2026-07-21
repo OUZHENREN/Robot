@@ -1,0 +1,48 @@
+std_msgs/Header header
+
+bool parser_ok
+bool has_joint_data
+bool has_actual_tool_data
+bool has_target_tool_data
+bool has_actual_tcp_wrench
+
+float64[6] actual_joint_deg
+float64[6] target_joint_deg
+float64[6] actual_velocity_deg
+float64[6] joint_current
+float64[6] joint_voltage
+float64[6] joint_temperature
+float64[6] joint_torques
+
+float64 actual_tcp_x_mm
+float64 actual_tcp_y_mm
+float64 actual_tcp_z_mm
+float64 actual_rot_x_deg
+float64 actual_rot_y_deg
+float64 actual_rot_z_deg
+float64 actual_tcp_offset_x_mm
+float64 actual_tcp_offset_y_mm
+float64 actual_tcp_offset_z_mm
+float64 actual_tcp_offset_rx_deg
+float64 actual_tcp_offset_ry_deg
+float64 actual_tcp_offset_rz_deg
+
+float64 actual_tcp_force_x
+float64 actual_tcp_force_y
+float64 actual_tcp_force_z
+float64 actual_tcp_torque_x
+float64 actual_tcp_torque_y
+float64 actual_tcp_torque_z
+
+float64 target_tcp_x_mm
+float64 target_tcp_y_mm
+float64 target_tcp_z_mm
+float64 target_rot_x_deg
+float64 target_rot_y_deg
+float64 target_rot_z_deg
+float64 target_tcp_offset_x_mm
+float64 target_tcp_offset_y_mm
+float64 target_tcp_offset_z_mm
+float64 target_tcp_offset_rx_deg
+float64 target_tcp_offset_ry_deg
+float64 target_tcp_offset_rz_deg

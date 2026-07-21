@@ -1,0 +1,8 @@
+# Request
+geometry_msgs/PoseStamped target_pose
+sensor_msgs/JointState seed        # optional: empty positions means no seed
+
+---
+# Response
+bool success
+sensor_msgs/JointState solution

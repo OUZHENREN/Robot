@@ -1,0 +1,8 @@
+---
+bool success
+string message
+int32 available_file_count
+int32 enabled_file_count
+int64 raw_points
+int64 processed_points
+int32 reload_count

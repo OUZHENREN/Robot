@@ -1,0 +1,7 @@
+cs625_raw_state_receiver_node:
+  ros__parameters:
+    robot_ip: "192.168.1.200"
+    robot_port: 30001
+    recv_buffer_size: 4096
+    socket_timeout_sec: 0.1
+    reconnect_interval_sec: 1.0

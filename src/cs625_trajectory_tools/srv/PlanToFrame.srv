@@ -1,0 +1,8 @@
+# Request
+string frame_id   # 例如 "slot_origin", "box_pre_grasp_tcp", 等 TF frame 名称
+
+---
+# Response
+bool success
+string message
+float64 planning_time

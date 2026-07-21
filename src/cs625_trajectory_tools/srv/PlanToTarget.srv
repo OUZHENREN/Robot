@@ -1,0 +1,7 @@
+geometry_msgs/PoseStamped target_pose
+sensor_msgs/JointState target_joint_state
+bool use_joint_target
+---
+bool success
+string message
+float64 planning_time

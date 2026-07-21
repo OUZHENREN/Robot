@@ -1,0 +1,9 @@
+# Request
+geometry_msgs/PoseStamped target_pose
+int32 max_solutions
+sensor_msgs/JointState seed        # optional
+
+---
+# Response
+bool success
+cs625_kinematics/IkSolution[] solutions

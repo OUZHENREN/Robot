@@ -9,6 +9,17 @@
 
   <depend>launch</depend>
   <depend>launch_ros</depend>
+  <depend>eli_cs_robot_driver</depend>
+  <depend>eli_cs_robot_description</depend>
+  <depend>elite_cs625_moveit_config</depend>
+  <depend>cs625_kinematics</depend>
+  <depend>tcp_bridge</depend>
+  <depend>environment_point_cloud_publisher</depend>
+  <depend>workspace_pointcloud_sampler</depend>
+  <depend>environment_collision_generator</depend>
+  <depend>cs625_trajectory_tools</depend>
+  <depend>cs625_state_monitor</depend>
+  <depend>cs625_task_manager</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

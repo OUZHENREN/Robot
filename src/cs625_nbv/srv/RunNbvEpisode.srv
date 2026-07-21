@@ -1,0 +1,10 @@
+# Request to run a new NBV episode
+string target_object_id        # Identifier of the target object
+string strategy_name           # Strategy: "single_view", "fixed_order", "random_reachable",
+                                #           "coverage_greedy", "uncertainty_only", "pose_gain"
+int32 max_views                # Maximum number of views (default: 6)
+---
+# Response: episode complete
+bool success                   # True if episode ran without error
+string message                 # Error description if failed
+cs625_nbv/EpisodeResult result # Full episode result

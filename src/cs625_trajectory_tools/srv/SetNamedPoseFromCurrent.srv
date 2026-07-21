@@ -1,0 +1,5 @@
+# 请求：将当前机器人末端位姿记录为一个命名姿态（例如 "home_tcp"）
+string name
+---
+bool success
+string message

@@ -17,6 +17,7 @@ def launch_setup(context, *args, **kwargs):
     moveit_config_package = LaunchConfiguration("moveit_config_package")
     moveit_config_file = LaunchConfiguration("moveit_config_file")
     prefix = LaunchConfiguration("prefix")
+    world_file = LaunchConfiguration("world_file")
 
     cs_control_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
@@ -31,12 +32,13 @@ def launch_setup(context, *args, **kwargs):
             "description_file": description_file,
             "prefix": prefix,
             "launch_rviz": "false",
+            "world_file": world_file,
         }.items(),
     )
 
     cs_moveit_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("eli_cs_robot_moveit_config"), "/launch", "/cs_moveit.launch.py"
+            FindPackageShare("elite_cs625_moveit_config"), "/launch", "/cs625_moveit.launch.py"
         ]),
         launch_arguments={
             "cs_type": cs_type,
@@ -60,7 +62,7 @@ def generate_launch_description():
             "cs_type",
             description="Type/series of used ELITE CS robot.",
             choices=["cs63", "cs66", "cs612", "cs616", "cs620", "cs625"],
-            default_value="cs66",
+            default_value="cs625",
         ),
         DeclareLaunchArgument(
             "safety_limits",
@@ -84,12 +86,12 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "description_file",
-            default_value="cs.urdf.xacro",
+            default_value="cs625.urdf.xacro",
             description="URDF/XACRO description file with the robot.",
         ),
         DeclareLaunchArgument(
             "moveit_config_package",
-            default_value="eli_cs_robot_moveit_config",
+            default_value="elite_cs625_moveit_config",
             description="MoveIt config package with robot SRDF/XACRO files.",
         ),
         DeclareLaunchArgument(
@@ -101,6 +103,11 @@ def generate_launch_description():
             "prefix",
             default_value='""',
             description="Prefix of the joint names, useful for multi-robot setup.",
+        ),
+        DeclareLaunchArgument(
+            "world_file",
+            default_value="empty.sdf",
+            description="Gazebo world file to load.",
         ),
     ]
 

@@ -30,6 +30,7 @@ def launch_setup(context, *args, **kwargs):
     start_joint_controller = LaunchConfiguration("start_joint_controller")
     initial_joint_controller = LaunchConfiguration("initial_joint_controller")
     launch_rviz = LaunchConfiguration("launch_rviz")
+    world_file = LaunchConfiguration("world_file")
 
     initial_joint_controllers = PathJoinSubstitution(
         [FindPackageShare(runtime_config_package), "config", controllers_file]
@@ -138,7 +139,7 @@ def launch_setup(context, *args, **kwargs):
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments={"gz_args": " -r -v 4 empty.sdf"}.items(),
+        launch_arguments={"gz_args": [" -r -v 4 ", world_file]}.items(),
     )
 
     nodes_to_start = [
@@ -162,7 +163,7 @@ def generate_launch_description():
             "cs_type",
             description="Type/series of used ELITE CS robot.",
             choices=["cs63", "cs66", "cs612", "cs616", "cs620", "cs625"],
-            default_value="cs66",
+            default_value="cs625",
         )
     )
     declared_arguments.append(
@@ -213,7 +214,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "description_file",
-            default_value="cs.urdf.xacro",
+            default_value="cs625.urdf.xacro",
             description="URDF/XACRO description file with the robot.",
         )
     )
@@ -242,6 +243,13 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument("launch_rviz", default_value="true", description="Launch RViz?")
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "world_file",
+            default_value="empty.sdf",
+            description="Gazebo world file to load.",
+        )
     )
 
     return LaunchDescription(declared_arguments + [OpaqueFunction(function=launch_setup)])
