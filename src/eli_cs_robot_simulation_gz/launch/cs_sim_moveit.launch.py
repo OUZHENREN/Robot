@@ -2,6 +2,7 @@
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.substitutions import FindPackageShare
@@ -18,6 +19,7 @@ def launch_setup(context, *args, **kwargs):
     moveit_config_file = LaunchConfiguration("moveit_config_file")
     prefix = LaunchConfiguration("prefix")
     world_file = LaunchConfiguration("world_file")
+    launch_rviz = LaunchConfiguration("launch_rviz")
 
     cs_control_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
@@ -53,7 +55,21 @@ def launch_setup(context, *args, **kwargs):
         }.items(),
     )
 
-    return [cs_control_launch, cs_moveit_launch]
+    cs_moveit_rviz_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("elite_cs625_moveit_config"),
+            "/launch",
+            "/moveit_rviz.launch.py",
+        ]),
+        launch_arguments={
+            "cs_type": cs_type,
+            "tf_prefix": prefix,
+            "use_fake_hardware": "false",
+        }.items(),
+        condition=IfCondition(launch_rviz),
+    )
+
+    return [cs_control_launch, cs_moveit_launch, cs_moveit_rviz_launch]
 
 
 def generate_launch_description():
@@ -108,6 +124,11 @@ def generate_launch_description():
             "world_file",
             default_value="empty.sdf",
             description="Gazebo world file to load.",
+        ),
+        DeclareLaunchArgument(
+            "launch_rviz",
+            default_value="true",
+            description="Launch the MoveIt RViz configuration.",
         ),
     ]
 

@@ -142,8 +142,19 @@ def launch_setup(context, *args, **kwargs):
         launch_arguments={"gz_args": [" -r -v 4 ", world_file]}.items(),
     )
 
+    # Gazebo owns simulation time. Bridge it into ROS so joint-state stamps,
+    # robot_state_publisher TF, MoveIt and monitoring nodes share one clock.
+    clock_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        name="clock_bridge",
+        arguments=["/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"],
+        output="log",
+    )
+
     nodes_to_start = [
         robot_state_publisher_node,
+        clock_bridge,
         joint_state_broadcaster_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         initial_joint_controller_spawner_stopped,
