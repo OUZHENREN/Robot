@@ -2,8 +2,16 @@
 <sdf version="1.9">
   <world name="nbv_world">
 
-    <!-- Scene broadcaster for communicating with ROS2 -->
-    <plugin name="sc_broadcaster" filename="ignition-gazebo-scene-broadcaster-system.so"/>
+    <!-- Once any system is listed explicitly, Gazebo no longer injects its
+         default systems. Keep the complete standard set here. -->
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+
+    <!-- Required for RGB-D cameras and other rendering-based sensors. -->
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
 
     <!-- Physics -->
     <physics name="1ms" type="ignored">

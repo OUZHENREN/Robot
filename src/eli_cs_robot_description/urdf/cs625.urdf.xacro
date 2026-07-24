@@ -173,17 +173,6 @@
              <far>5.0</far>
            </clip>
          </camera>
-         <depth_camera>
-           <image>
-             <width>640</width>
-             <height>480</height>
-             <format>R_FLOAT32</format>
-           </image>
-           <clip>
-             <near>0.05</near>
-             <far>5.0</far>
-           </clip>
-         </depth_camera>
        </sensor>
      </gazebo>
    </xacro:if>
@@ -230,11 +219,11 @@
   </xacro:if>
 
   <xacro:if value="$(arg sim_ignition)">
-    <!-- Gazebo plugins -->
+    <!-- Gazebo Sim (ROS 2 Jazzy) control plugin -->
     <gazebo reference="world">
     </gazebo>
     <gazebo>
-      <plugin filename="libign_ros2_control-system.so" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+      <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
         <parameters>$(arg simulation_controllers)</parameters>
         <controller_manager_node_name>$(arg tf_prefix)controller_manager</controller_manager_node_name>
       </plugin>
@@ -242,4 +231,3 @@
   </xacro:if>
 
 </robot>
-

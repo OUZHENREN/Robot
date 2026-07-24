@@ -93,6 +93,21 @@ private:
         RCLCPP_INFO(this->get_logger(), "Starting NBV episode: strategy=%s",
                     req->strategy_name.c_str());
 
+        // Never report convergence from an empty camera message. PCL accepts
+        // the default-constructed PointCloud2 far enough to produce a tiny
+        // covariance, which looks like a successful episode but contains no
+        // measurement evidence.
+        if (!has_cloud_ || latest_cloud_.data.empty()) {
+            resp->success = false;
+            resp->message =
+                "No point cloud received on /camera/points; episode not started";
+            RCLCPP_WARN(
+                this->get_logger(),
+                "Rejecting NBV episode because /camera/points is empty"
+            );
+            return;
+        }
+
         // Set up callbacks for simulation (capture from latest cloud)
         orchestrator_.set_capture_callback([this]() -> sensor_msgs::msg::PointCloud2 {
             return latest_cloud_;
