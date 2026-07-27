@@ -43,6 +43,7 @@ from launch_ros.substitutions import FindPackageShare
 def launch_setup(context, *args, **kwargs):
     cs_type = LaunchConfiguration("cs_type")
     launch_rviz = LaunchConfiguration("launch_rviz")
+    headless = LaunchConfiguration("headless")
     enable_rgbd_sensor = LaunchConfiguration("enable_rgbd_sensor")
 
     # Keep NBV runtime data independent from legacy/broken shared-folder links.
@@ -109,6 +110,7 @@ def launch_setup(context, *args, **kwargs):
         launch_arguments={
             "cs_type": cs_type,
             "launch_rviz": launch_rviz,
+            "headless": headless,
             "world_file": world_path,
         }.items(),
     )
@@ -200,6 +202,14 @@ def generate_launch_description():
             "launch_rviz",
             default_value="true",
             description="Launch RViz for visualization.",
+        ),
+        DeclareLaunchArgument(
+            "headless",
+            default_value="false",
+            description=(
+                "Run Gazebo server-only without a GUI. Use true for SSH/CI "
+                "validation; keep false for local visual demonstrations."
+            ),
         ),
         DeclareLaunchArgument(
             "enable_rgbd_sensor",

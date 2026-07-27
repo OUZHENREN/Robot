@@ -1,5 +1,7 @@
 
-# 艾利特 CS625 机械臂 ROS 2 项目 (Elite CS625 ROS 2 Project)
+# Robot
+
+ROS2代码仓库 —— 艾利特 CS625 机械臂 ROS 2 项目 (Elite CS625 ROS 2 Project)
 
 本项目是用于控制和可视化艾利特（Elite）CS625协作机器人的ROS 2工作空间。该项目基于官方驱动，并进行了多项稳定性和易用性优化，以解决在实际部署中遇到的连接和鲁棒性问题。
 

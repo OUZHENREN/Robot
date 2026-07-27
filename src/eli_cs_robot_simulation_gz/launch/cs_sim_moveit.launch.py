@@ -20,6 +20,7 @@ def launch_setup(context, *args, **kwargs):
     prefix = LaunchConfiguration("prefix")
     world_file = LaunchConfiguration("world_file")
     launch_rviz = LaunchConfiguration("launch_rviz")
+    headless = LaunchConfiguration("headless")
 
     cs_control_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
@@ -34,6 +35,7 @@ def launch_setup(context, *args, **kwargs):
             "description_file": description_file,
             "prefix": prefix,
             "launch_rviz": "false",
+            "headless": headless,
             "world_file": world_file,
         }.items(),
     )
@@ -51,7 +53,7 @@ def launch_setup(context, *args, **kwargs):
             "moveit_config_file": moveit_config_file,
             "prefix": prefix,
             "use_sim_time": "true",
-            "launch_rviz": "true",
+            "launch_rviz": launch_rviz,
         }.items(),
     )
 
@@ -129,6 +131,11 @@ def generate_launch_description():
             "launch_rviz",
             default_value="true",
             description="Launch the MoveIt RViz configuration.",
+        ),
+        DeclareLaunchArgument(
+            "headless",
+            default_value="false",
+            description="Run Gazebo without its GUI.",
         ),
     ]
 

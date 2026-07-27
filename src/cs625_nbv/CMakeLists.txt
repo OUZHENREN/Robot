@@ -118,11 +118,18 @@ ament_target_dependencies(viewpoint_publisher_node
   geometry_msgs
 )
 
+# GPU-independent point-cloud source for remote software-only development.
+add_executable(synthetic_camera_publisher_node src/synthetic_camera_publisher_node.cpp)
+ament_target_dependencies(synthetic_camera_publisher_node
+  rclcpp
+  sensor_msgs
+)
+
 # ---------------------------------------------------------------------------
 # Install
 # ---------------------------------------------------------------------------
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
-install(TARGETS cs625_nbv_core nbv_server_node viewpoint_publisher_node
+install(TARGETS cs625_nbv_core nbv_server_node viewpoint_publisher_node synthetic_camera_publisher_node
   EXPORT ${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -131,7 +138,7 @@ install(TARGETS cs625_nbv_core nbv_server_node viewpoint_publisher_node
 install(DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME}
 )
-install(TARGETS cs625_nbv_core nbv_server_node viewpoint_publisher_node
+install(TARGETS cs625_nbv_core nbv_server_node viewpoint_publisher_node synthetic_camera_publisher_node
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}

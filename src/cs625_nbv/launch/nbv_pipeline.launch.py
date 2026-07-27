@@ -11,11 +11,26 @@ Usage (after simulation started):
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    use_synthetic_camera = LaunchConfiguration("use_synthetic_camera")
+
+    synthetic_camera_node = Node(
+        package="cs625_nbv",
+        executable="synthetic_camera_publisher_node",
+        name="cs625_synthetic_camera",
+        output="log",
+        condition=IfCondition(use_synthetic_camera),
+        parameters=[
+            {"frame_id": "base_link"},
+            {"publish_hz": 2.0},
+        ],
+    )
+
     # NBV server node (orchestrator + services)
     nbv_server_node = Node(
         package="cs625_nbv",
@@ -29,6 +44,7 @@ def generate_launch_description():
             {"translation_threshold": 0.003},
             {"rotation_threshold_deg": 2.0},
             {"log_base_dir": "~/nbv_experiments"},
+            {"bootstrap_model_from_first_cloud": use_synthetic_camera},
         ],
     )
 
@@ -45,6 +61,15 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        DeclareLaunchArgument(
+            "use_synthetic_camera",
+            default_value="true",
+            description=(
+                "Publish a deterministic cuboid cloud for remote software-only "
+                "validation. Set false for Gazebo RGB-D or real-camera input."
+            ),
+        ),
+        synthetic_camera_node,
         nbv_server_node,
         viewpoint_pub_node,
     ])

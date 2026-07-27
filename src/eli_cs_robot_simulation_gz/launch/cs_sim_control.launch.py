@@ -30,7 +30,14 @@ def launch_setup(context, *args, **kwargs):
     start_joint_controller = LaunchConfiguration("start_joint_controller")
     initial_joint_controller = LaunchConfiguration("initial_joint_controller")
     launch_rviz = LaunchConfiguration("launch_rviz")
+    headless = LaunchConfiguration("headless")
     world_file = LaunchConfiguration("world_file")
+
+    # A GUI is appropriate for local demonstrations but cannot be created
+    # reliably from a remote SSH session. Keep the server and ROS interfaces
+    # identical in either mode.
+    headless_value = headless.perform(context).lower() in ("1", "true", "yes", "on")
+    gz_arguments = " -s -r -v 4 " if headless_value else " -r -v 4 "
 
     initial_joint_controllers = PathJoinSubstitution(
         [FindPackageShare(runtime_config_package), "config", controllers_file]
@@ -139,7 +146,7 @@ def launch_setup(context, *args, **kwargs):
         PythonLaunchDescriptionSource(
             [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
         ),
-        launch_arguments={"gz_args": [" -r -v 4 ", world_file]}.items(),
+        launch_arguments={"gz_args": [gz_arguments, world_file]}.items(),
     )
 
     # Gazebo owns simulation time. Bridge it into ROS so joint-state stamps,
@@ -254,6 +261,13 @@ def generate_launch_description():
     )
     declared_arguments.append(
         DeclareLaunchArgument("launch_rviz", default_value="true", description="Launch RViz?")
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "headless",
+            default_value="false",
+            description="Run Gazebo server-only without a GUI.",
+        )
     )
     declared_arguments.append(
         DeclareLaunchArgument(

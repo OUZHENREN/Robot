@@ -32,6 +32,7 @@ public:
         this->declare_parameter("translation_threshold", 0.003);
         this->declare_parameter("rotation_threshold_deg", 2.0);
         this->declare_parameter("log_base_dir", "~/nbv_experiments");
+        this->declare_parameter("bootstrap_model_from_first_cloud", false);
 
         // Configure orchestrator
         cs625_nbv::CameraModel camera;
@@ -106,6 +107,18 @@ private:
                 "Rejecting NBV episode because /camera/points is empty"
             );
             return;
+        }
+
+        // This is only enabled by the remote synthetic-camera launch profile.
+        // Real-camera operation must provide a CAD/model cloud explicitly.
+        if (this->get_parameter("bootstrap_model_from_first_cloud").as_bool() &&
+            !model_cloud_initialized_) {
+            orchestrator_.set_model_cloud(latest_cloud_);
+            model_cloud_initialized_ = true;
+            RCLCPP_WARN(
+                this->get_logger(),
+                "Bootstrapped ICP model from synthetic first cloud; results are software smoke-test data"
+            );
         }
 
         // Set up callbacks for simulation (capture from latest cloud)
@@ -184,6 +197,7 @@ private:
     sensor_msgs::msg::PointCloud2 latest_cloud_;
     sensor_msgs::msg::JointState latest_joints_;
     bool has_cloud_{false};
+    bool model_cloud_initialized_{false};
 };
 
 int main(int argc, char** argv)
