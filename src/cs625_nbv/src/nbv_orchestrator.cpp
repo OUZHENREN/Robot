@@ -19,11 +19,20 @@ double rotationErrorToVirtualTruth(const Eigen::Isometry3d& estimate)
     return Eigen::AngleAxisd(estimate.rotation()).angle();
 }
 
-double expectedTranslationStdReduction(
+struct TranslationPrediction {
+    double reduction{0.0};
+    double prior_std{0.0};
+    double predicted_posterior_std{0.0};
+    double view_novelty{0.0};
+    double observability_score{0.0};
+};
+
+TranslationPrediction expectedTranslationStdReduction(
     const InformationGain& information_gain,
     const Eigen::Matrix<double, 6, 6>& covariance,
     const geometry_msgs::msg::PoseStamped& candidate,
-    const Eigen::Vector3d& target)
+    const Eigen::Vector3d& target,
+    const std::vector<Eigen::Vector3d>& prior_view_directions)
 {
     Eigen::Isometry3d camera_pose = Eigen::Isometry3d::Identity();
     camera_pose.translation() = Eigen::Vector3d(
@@ -35,21 +44,19 @@ double expectedTranslationStdReduction(
     );
     camera_pose.linear() = orientation.toRotationMatrix();
 
-    const Eigen::Vector3d view_dir = (camera_pose.translation() - target).normalized();
-    constexpr double area_yz = 0.06 * 0.10;
-    constexpr double area_xz = 0.08 * 0.10;
-    constexpr double area_xy = 0.08 * 0.06;
-    const double projected_area = area_yz * std::abs(view_dir.x())
-        + area_xz * std::abs(view_dir.y()) + area_xy * std::abs(view_dir.z());
-    const double visibility = std::max(0.05, std::min(1.0,
-        0.8 * projected_area / (area_yz + area_xz + area_xy)));
-    const auto expected = information_gain.expected_covariance(
-        covariance, camera_pose, target, visibility
+    const auto prediction = information_gain.predict_observation(
+        covariance, camera_pose, target, prior_view_directions
     );
     const auto translation_std = [](const auto& sigma) {
         return std::sqrt(std::max(0.0, sigma(0, 0) + sigma(1, 1) + sigma(2, 2)));
     };
-    return std::max(0.0, translation_std(covariance) - translation_std(expected));
+    TranslationPrediction result;
+    result.prior_std = translation_std(covariance);
+    result.predicted_posterior_std = translation_std(prediction.expected_covariance);
+    result.reduction = std::max(0.0, result.prior_std - result.predicted_posterior_std);
+    result.view_novelty = prediction.view_novelty;
+    result.observability_score = prediction.observability_score;
+    return result;
 }
 
 }  // namespace
@@ -100,12 +107,17 @@ EpisodeResult NbvOrchestrator::run_episode(
     ig_history_.clear();
     error_history_.clear();
     step_records_.clear();
+    executed_view_directions_.clear();
     current_pose_ = Eigen::Isometry3d::Identity();
     current_camera_position_ = Eigen::Vector3d(
         initial_viewpoint.pose.position.x,
         initial_viewpoint.pose.position.y,
         initial_viewpoint.pose.position.z
     );
+    const Eigen::Vector3d initial_view_offset = current_camera_position_ - target_center;
+    if (initial_view_offset.squaredNorm() > 1e-12) {
+        executed_view_directions_.push_back(initial_view_offset.normalized());
+    }
     current_covariance_ = Eigen::Matrix<double, 6, 6>::Identity();
     current_covariance_(0, 0) = 0.01;
     current_covariance_(1, 1) = 0.01;
@@ -174,8 +186,12 @@ EpisodeResult NbvOrchestrator::run_episode(
                 model_point_count_
             : 0.0,
         bootstrap_rmse,
-        bootstrap_rmse,
+        0.0,
         initial_covariance_std,
+        initial_covariance_std,
+        initial_covariance_std,
+        1.0,
+        0.0,
         0, 0
     });
 
@@ -214,7 +230,10 @@ EpisodeResult NbvOrchestrator::run_episode(
         result.candidates_generated += static_cast<int>(candidates.size());
 
         // Score them with information gain
-        score_candidates(candidates, current_covariance_, information_gain_);
+        score_candidates(
+            candidates, current_covariance_, information_gain_,
+            target_center, executed_view_directions_
+        );
 
         // Count reachable
         for (const auto& c : candidates) {
@@ -234,8 +253,9 @@ EpisodeResult NbvOrchestrator::run_episode(
             result.failure_reason = "no_reachable_candidate";
             break;
         }
-        const double predicted_uncertainty_reduction = expectedTranslationStdReduction(
-            information_gain_, current_covariance_, candidates[selected_idx].pose, target_center
+        const auto prediction = expectedTranslationStdReduction(
+            information_gain_, current_covariance_, candidates[selected_idx].pose,
+            target_center, executed_view_directions_
         );
 
         // ---------------------------------------------------------------
@@ -275,6 +295,8 @@ EpisodeResult NbvOrchestrator::run_episode(
         transition(SCORE);
         Eigen::Isometry3d new_estimate = Eigen::Isometry3d::Identity();
         double registration_rmse = 0.0;
+        const Eigen::Matrix<double, 6, 6> prior_covariance = current_covariance_;
+        const Eigen::Isometry3d prior_pose = current_pose_;
         if (!new_cloud.data.empty()) {
             if (observation_model_cb_) {
                 const auto visible_model = observation_model_cb_();
@@ -284,11 +306,16 @@ EpisodeResult NbvOrchestrator::run_episode(
             }
             new_estimate = pose_estimator_.estimate_pose(new_cloud, current_pose_);
             registration_rmse = pose_estimator_.last_registration_rmse();
+            const auto measurement_covariance = covariance_estimator_.estimate_covariance(
+                pose_estimator_, new_cloud, new_estimate
+            );
+            current_covariance_ = covariance_estimator_.fuse_covariances(
+                prior_covariance, measurement_covariance
+            );
+            current_pose_ = covariance_estimator_.fuse_pose_estimates(
+                prior_pose, prior_covariance, new_estimate, measurement_covariance
+            );
         }
-        current_covariance_ = covariance_estimator_.estimate_covariance(
-            pose_estimator_, new_cloud, new_estimate
-        );
-        current_pose_ = new_estimate;
 
         // Compute achieved IG
         double ig_achieved = last_ig_ > 1e-10
@@ -332,15 +359,25 @@ EpisodeResult NbvOrchestrator::run_episode(
                 ? static_cast<double>(new_cloud.width * std::max(1U, new_cloud.height)) /
                     model_point_count_
                 : 0.0,
-            predicted_uncertainty_reduction,
             registration_rmse,
+            prediction.reduction,
+            prediction.prior_std,
+            prediction.predicted_posterior_std,
             covariance_std,
+            prediction.view_novelty,
+            prediction.observability_score,
             static_cast<int>(candidates.size()),
             static_cast<int>(std::count_if(
                 candidates.begin(), candidates.end(),
                 [](const auto& candidate) { return candidate.reachable; }
             ))
         });
+
+        const Eigen::Vector3d selected_view_offset =
+            current_camera_position_ - target_center;
+        if (selected_view_offset.squaredNorm() > 1e-12) {
+            executed_view_directions_.push_back(selected_view_offset.normalized());
+        }
 
         if (trans_error < stop_.translation_threshold &&
             rot_error < (stop_.rotation_threshold * M_PI / 180.0)) {

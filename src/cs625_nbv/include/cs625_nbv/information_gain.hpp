@@ -27,6 +27,15 @@ public:
         double lambda_tau{0.3};    // Time cost weight
     };
 
+    /** Pre-observation virtual observability prediction for one candidate. */
+    struct ObservationPrediction {
+        double visibility_fraction{0.0};
+        double view_novelty{0.0};
+        double observability_score{0.0};
+        Eigen::Matrix<double, 6, 6> expected_covariance{
+            Eigen::Matrix<double, 6, 6>::Identity()};
+    };
+
     InformationGain();  // Default weights and utility config
     InformationGain(const WeightConfig& w,
                     const UtilityConfig& u);
@@ -59,7 +68,21 @@ public:
         const Eigen::Matrix<double, 6, 6>& Sigma_t,
         const Eigen::Isometry3d& camera_pose,
         const Eigen::Vector3d& target_center,
-        double visibility_fraction
+        double visibility_fraction,
+        double view_novelty = 1.0
+    ) const;
+
+    /**
+     * @brief Predict visibility, view novelty and posterior covariance before capture.
+     *
+     * The prediction uses only known virtual geometry and previously executed
+     * view directions. It never consumes the next measurement or truth error.
+     */
+    ObservationPrediction predict_observation(
+        const Eigen::Matrix<double, 6, 6>& Sigma_t,
+        const Eigen::Isometry3d& camera_pose,
+        const Eigen::Vector3d& target_center,
+        const std::vector<Eigen::Vector3d>& prior_view_directions
     ) const;
 
     /**
@@ -98,6 +121,14 @@ void score_candidates(
     std::vector<cs625_nbv::msg::ViewpointCandidate>& candidates,
     const Eigen::Matrix<double, 6, 6>& current_covariance,
     InformationGain& ig
+);
+
+void score_candidates(
+    std::vector<cs625_nbv::msg::ViewpointCandidate>& candidates,
+    const Eigen::Matrix<double, 6, 6>& current_covariance,
+    InformationGain& ig,
+    const Eigen::Vector3d& target_center,
+    const std::vector<Eigen::Vector3d>& prior_view_directions
 );
 
 }  // namespace cs625_nbv

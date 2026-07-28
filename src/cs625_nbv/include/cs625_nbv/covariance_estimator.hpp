@@ -44,6 +44,25 @@ public:
     );
 
     /**
+     * @brief Fuse independent local 6D covariance estimates in information form.
+     *
+     * This virtual-experiment diagnostic assumes independent measurements and
+     * is not a calibrated hardware uncertainty model.
+     */
+    Eigen::Matrix<double, 6, 6> fuse_covariances(
+        const Eigen::Matrix<double, 6, 6>& prior_covariance,
+        const Eigen::Matrix<double, 6, 6>& measurement_covariance
+    ) const;
+
+    /** Fuse local tangent-space pose estimates using the same information form. */
+    Eigen::Isometry3d fuse_pose_estimates(
+        const Eigen::Isometry3d& prior_pose,
+        const Eigen::Matrix<double, 6, 6>& prior_covariance,
+        const Eigen::Isometry3d& measurement_pose,
+        const Eigen::Matrix<double, 6, 6>& measurement_covariance
+    ) const;
+
+    /**
      * @brief Perturb a pose with Gaussian noise.
      */
     Eigen::Isometry3d perturb_pose(const Eigen::Isometry3d& pose);

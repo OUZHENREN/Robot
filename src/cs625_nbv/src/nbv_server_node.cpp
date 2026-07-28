@@ -344,7 +344,11 @@ private:
                 step.visible_ratio,
                 step.registration_rmse,
                 step.uncertainty_proxy,
+                step.prior_covariance_translation_std,
+                step.predicted_posterior_covariance_translation_std,
                 step.covariance_translation_std,
+                step.view_novelty,
+                step.observability_score,
                 step.candidates_generated,
                 step.reachable_candidates
             );
@@ -365,6 +369,8 @@ private:
                     : 0) << "\n"
                << "ground_truth_pose_contract: T_base_model_identity_virtual_only\n"
                << "planning_cost_model: euclidean_viewpoint_proxy\n"
+               << "uncertainty_model: p4_sequential_information_fusion_virtual_only\n"
+               << "observability_model: projected_visibility_times_view_novelty\n"
                << "git_commit: " << metadata.git_commit << "\n"
                << "ros_distro: " << metadata.ros_distro << "\n"
                << "covariance_bootstrap_samples: "
