@@ -49,3 +49,9 @@ cs625_nbv:
     use_model_cloud_topic: false
     virtual_camera_settle_ms: 250
     covariance_bootstrap_samples: 30
+
+    # ---- P4 virtual-only sequential observability diagnostics ----
+    # Each new bootstrap-ICP estimate is fused in local information form.
+    # Do not treat these values as calibrated real-camera uncertainty.
+    uncertainty_model: "p4_sequential_information_fusion_virtual_only"
+    observability_model: "projected_visibility_times_view_novelty"

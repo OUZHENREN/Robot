@@ -39,7 +39,11 @@ public:
         double visible_ratio{0.0};
         double registration_rmse{0.0};
         double uncertainty_proxy{0.0};
+        double prior_covariance_translation_std{0.0};
+        double predicted_posterior_covariance_translation_std{0.0};
         double covariance_translation_std{0.0};
+        double view_novelty{0.0};
+        double observability_score{0.0};
         int candidates_generated{0};
         int reachable_candidates{0};
     };
@@ -150,6 +154,7 @@ private:
     uint32_t random_seed_{625U};
     uint32_t model_point_count_{0};
     Eigen::Vector3d current_camera_position_{Eigen::Vector3d::Zero()};
+    std::vector<Eigen::Vector3d> executed_view_directions_;
 
     // Callbacks
     PlanCallback plan_cb_;

@@ -1,8 +1,63 @@
 #include "cs625_nbv/information_gain.hpp"
 #include <algorithm>
 #include <cmath>
+#include <Eigen/Eigenvalues>
 
 namespace cs625_nbv {
+namespace {
+
+double projectedCuboidVisibility(const Eigen::Vector3d& view_direction)
+{
+    constexpr double area_yz = 0.06 * 0.10;
+    constexpr double area_xz = 0.08 * 0.10;
+    constexpr double area_xy = 0.08 * 0.06;
+    const double projected_area = area_yz * std::abs(view_direction.x())
+        + area_xz * std::abs(view_direction.y())
+        + area_xy * std::abs(view_direction.z());
+    return std::clamp(
+        0.8 * projected_area / (area_yz + area_xz + area_xy), 0.05, 1.0
+    );
+}
+
+Eigen::Matrix<double, 6, 6> regularizeCovariance(
+    const Eigen::Matrix<double, 6, 6>& covariance)
+{
+    constexpr double kMinimumEigenvalue = 1e-9;
+    const Eigen::Matrix<double, 6, 6> symmetric =
+        0.5 * (covariance + covariance.transpose());
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, 6, 6>> solver(symmetric);
+    if (solver.info() != Eigen::Success) {
+        return Eigen::Matrix<double, 6, 6>::Identity() * kMinimumEigenvalue;
+    }
+    Eigen::Matrix<double, 6, 1> eigenvalues = solver.eigenvalues();
+    for (int index = 0; index < eigenvalues.size(); ++index) {
+        eigenvalues(index) = std::max(kMinimumEigenvalue, eigenvalues(index));
+    }
+    return solver.eigenvectors() * eigenvalues.asDiagonal() * solver.eigenvectors().transpose();
+}
+
+double viewNovelty(
+    const Eigen::Vector3d& candidate_direction,
+    const std::vector<Eigen::Vector3d>& prior_view_directions)
+{
+    if (prior_view_directions.empty()) {
+        return 1.0;
+    }
+    double maximum_similarity = -1.0;
+    for (const auto& prior_direction : prior_view_directions) {
+        if (prior_direction.squaredNorm() <= 1e-12) {
+            continue;
+        }
+        maximum_similarity = std::max(
+            maximum_similarity,
+            candidate_direction.dot(prior_direction.normalized())
+        );
+    }
+    // Repeated views remain measurable but have low predicted utility.
+    return std::clamp(1.0 - maximum_similarity, 0.05, 1.0);
+}
+
+}  // namespace
 
 InformationGain::InformationGain()
     : weights_{}, utility_{} {}
@@ -39,7 +94,8 @@ Eigen::Matrix<double, 6, 6> InformationGain::expected_covariance(
     const Eigen::Matrix<double, 6, 6>& Sigma_t,
     const Eigen::Isometry3d& camera_pose,
     const Eigen::Vector3d& target_center,
-    double visibility_fraction) const
+    double visibility_fraction,
+    double view_novelty) const
 {
     // Compute viewing geometry factors
     Eigen::Vector3d cam_to_target = target_center - camera_pose.translation();
@@ -52,7 +108,8 @@ Eigen::Matrix<double, 6, 6> InformationGain::expected_covariance(
 
     // Information matrix update: Lambda_{t+1} = Lambda_t + H^T R^{-1} H
     // Simplified model: measurement quality ∝ cos_angle * visibility / distance²
-    double quality_factor = cos_angle * visibility_fraction / (distance * distance + 0.01);
+    double quality_factor = cos_angle * visibility_fraction * view_novelty /
+        (distance * distance + 0.01);
 
     // Clamp quality factor
     quality_factor = std::max(0.0, std::min(quality_factor, 100.0));
@@ -71,13 +128,35 @@ Eigen::Matrix<double, 6, 6> InformationGain::expected_covariance(
     H_info(5, 5) = info_r;
 
     // Current information matrix (inverse of covariance)
-    Eigen::Matrix<double, 6, 6> Lambda_t = Sigma_t.inverse();
+    Eigen::Matrix<double, 6, 6> Lambda_t = regularizeCovariance(Sigma_t).inverse();
 
     // Updated information matrix
     Eigen::Matrix<double, 6, 6> Lambda_next = Lambda_t + H_info;
 
     // Expected covariance after observation
-    return Lambda_next.inverse();
+    return regularizeCovariance(Lambda_next.inverse());
+}
+
+InformationGain::ObservationPrediction InformationGain::predict_observation(
+    const Eigen::Matrix<double, 6, 6>& Sigma_t,
+    const Eigen::Isometry3d& camera_pose,
+    const Eigen::Vector3d& target_center,
+    const std::vector<Eigen::Vector3d>& prior_view_directions) const
+{
+    ObservationPrediction prediction;
+    const Eigen::Vector3d offset = camera_pose.translation() - target_center;
+    const Eigen::Vector3d view_direction = offset.squaredNorm() > 1e-12
+        ? offset.normalized()
+        : Eigen::Vector3d::UnitZ();
+    prediction.visibility_fraction = projectedCuboidVisibility(view_direction);
+    prediction.view_novelty = viewNovelty(view_direction, prior_view_directions);
+    prediction.observability_score =
+        prediction.visibility_fraction * prediction.view_novelty;
+    prediction.expected_covariance = expected_covariance(
+        Sigma_t, camera_pose, target_center,
+        prediction.visibility_fraction, prediction.view_novelty
+    );
+    return prediction;
 }
 
 double InformationGain::compute_utility(
@@ -101,7 +180,9 @@ void InformationGain::set_utility_config(const UtilityConfig& u) { utility_ = u;
 void score_candidates(
     std::vector<cs625_nbv::msg::ViewpointCandidate>& candidates,
     const Eigen::Matrix<double, 6, 6>& current_covariance,
-    InformationGain& ig)
+    InformationGain& ig,
+    const Eigen::Vector3d& target,
+    const std::vector<Eigen::Vector3d>& prior_view_directions)
 {
     for (auto& c : candidates) {
         if (!c.reachable) {
@@ -125,33 +206,27 @@ void score_candidates(
         );
         cam_pose.linear() = q.toRotationMatrix();
 
-        // Default target: camera looks at origin. In practice, the orchestrator
-        // will set the target center before calling this function.
-        Eigen::Vector3d target(0.5, 0.3, 0.845);
-
-        // Analytic virtual-cuboid visibility predictor. It only uses the
-        // candidate pose and known model dimensions, not the captured cloud.
-        // This gives the uncertainty-only/PoseGain ablation non-identical
-        // scores while preserving a causal, pre-observation selection rule.
-        const Eigen::Vector3d view_dir = (cam_pose.translation() - target).normalized();
-        constexpr double area_yz = 0.06 * 0.10;
-        constexpr double area_xz = 0.08 * 0.10;
-        constexpr double area_xy = 0.08 * 0.06;
-        const double projected_area = area_yz * std::abs(view_dir.x())
-            + area_xz * std::abs(view_dir.y())
-            + area_xy * std::abs(view_dir.z());
-        const double visibility = std::max(0.05, std::min(1.0,
-            0.8 * projected_area / (area_yz + area_xz + area_xy)));
-
-        Eigen::Matrix<double, 6, 6> expected = ig.expected_covariance(
-            current_covariance, cam_pose, target, visibility
+        const auto prediction = ig.predict_observation(
+            current_covariance, cam_pose, target, prior_view_directions
         );
-
-        c.information_gain = ig.compute_ig(current_covariance, expected);
+        c.information_gain = ig.compute_ig(
+            current_covariance, prediction.expected_covariance
+        );
         c.utility_score = ig.compute_utility(
             c.information_gain, c.path_length, c.planning_time
         );
     }
+}
+
+void score_candidates(
+    std::vector<cs625_nbv::msg::ViewpointCandidate>& candidates,
+    const Eigen::Matrix<double, 6, 6>& current_covariance,
+    InformationGain& ig)
+{
+    score_candidates(
+        candidates, current_covariance, ig,
+        Eigen::Vector3d(0.5, 0.3, 0.845), {}
+    );
 }
 
 }  // namespace cs625_nbv

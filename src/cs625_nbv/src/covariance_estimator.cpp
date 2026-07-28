@@ -1,10 +1,32 @@
 #include "cs625_nbv/covariance_estimator.hpp"
+#include <algorithm>
 #include <random>
 #include <cmath>
 #include <thread>
 #include <Eigen/Geometry>
+#include <Eigen/Eigenvalues>
 
 namespace cs625_nbv {
+namespace {
+
+Eigen::Matrix<double, 6, 6> regularizeCovariance(
+    const Eigen::Matrix<double, 6, 6>& covariance)
+{
+    constexpr double kMinimumEigenvalue = 1e-9;
+    const Eigen::Matrix<double, 6, 6> symmetric =
+        0.5 * (covariance + covariance.transpose());
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, 6, 6>> solver(symmetric);
+    if (solver.info() != Eigen::Success) {
+        return Eigen::Matrix<double, 6, 6>::Identity() * kMinimumEigenvalue;
+    }
+    Eigen::Matrix<double, 6, 1> eigenvalues = solver.eigenvalues();
+    for (int index = 0; index < eigenvalues.size(); ++index) {
+        eigenvalues(index) = std::max(kMinimumEigenvalue, eigenvalues(index));
+    }
+    return solver.eigenvectors() * eigenvalues.asDiagonal() * solver.eigenvectors().transpose();
+}
+
+}  // namespace
 
 CovarianceEstimator::CovarianceEstimator(int K, double trans_noise, double rot_noise)
     : K_(K), trans_noise_(trans_noise), rot_noise_(rot_noise), generator_(6252024U) {}
@@ -55,6 +77,33 @@ Eigen::Matrix<double, 6, 6> CovarianceEstimator::estimate_covariance(
     }
 
     return Sigma;
+}
+
+Eigen::Matrix<double, 6, 6> CovarianceEstimator::fuse_covariances(
+    const Eigen::Matrix<double, 6, 6>& prior_covariance,
+    const Eigen::Matrix<double, 6, 6>& measurement_covariance
+) const
+{
+    const auto prior = regularizeCovariance(prior_covariance);
+    const auto measurement = regularizeCovariance(measurement_covariance);
+    const auto information = prior.inverse() + measurement.inverse();
+    return regularizeCovariance(information.inverse());
+}
+
+Eigen::Isometry3d CovarianceEstimator::fuse_pose_estimates(
+    const Eigen::Isometry3d& prior_pose,
+    const Eigen::Matrix<double, 6, 6>& prior_covariance,
+    const Eigen::Isometry3d& measurement_pose,
+    const Eigen::Matrix<double, 6, 6>& measurement_covariance
+) const
+{
+    const auto prior = regularizeCovariance(prior_covariance);
+    const auto measurement = regularizeCovariance(measurement_covariance);
+    const auto posterior = fuse_covariances(prior, measurement);
+    const auto information_weighted_state =
+        prior.inverse() * pose_to_tangent(prior_pose) +
+        measurement.inverse() * pose_to_tangent(measurement_pose);
+    return tangent_to_pose(posterior * information_weighted_state);
 }
 
 Eigen::Isometry3d CovarianceEstimator::perturb_pose(const Eigen::Isometry3d& pose)

@@ -55,7 +55,10 @@ public:
                   double ig_achieved, double path_length, double planning_time,
                   uint32_t observation_points, double visible_ratio,
                   double registration_rmse, double uncertainty_proxy,
-                  double covariance_translation_std,
+                  double prior_covariance_translation_std,
+                  double predicted_posterior_covariance_translation_std,
+                  double covariance_translation_std, double view_novelty,
+                  double observability_score,
                   int candidates_generated, int reachable_candidates);
 
     /**

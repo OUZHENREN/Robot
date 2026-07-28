@@ -97,7 +97,9 @@ std::string ExperimentLogger::start_episode(
               << "random_seed,step,view_x,view_y,view_z,view_qx,view_qy,view_qz,view_qw,"
               << "trans_error,rot_error,add_score,"
               << "ig_achieved,path_length,planning_time,"
-              << "observation_points,visible_ratio,registration_rmse_m,uncertainty_proxy_m,covariance_translation_std_m,"
+              << "observation_points,visible_ratio,registration_rmse_m,uncertainty_proxy_m,"
+              << "prior_covariance_translation_std_m,predicted_posterior_covariance_translation_std_m,"
+              << "covariance_translation_std_m,view_novelty,observability_score,"
               << "candidates_generated,reachable_candidates,reachable_ratio\n";
     csv_file_ << std::setprecision(12);
     return current_episode_dir_;
@@ -111,7 +113,10 @@ void ExperimentLogger::log_step(
     double ig_achieved, double path_length, double planning_time,
     uint32_t observation_points, double visible_ratio,
     double registration_rmse, double uncertainty_proxy,
-    double covariance_translation_std,
+    double prior_covariance_translation_std,
+    double predicted_posterior_covariance_translation_std,
+    double covariance_translation_std, double view_novelty,
+    double observability_score,
     int candidates_generated, int reachable_candidates)
 {
     const double reachable_ratio = candidates_generated > 0
@@ -131,7 +136,10 @@ void ExperimentLogger::log_step(
               << ig_achieved << "," << path_length << "," << planning_time << ","
               << observation_points << "," << visible_ratio << ","
               << registration_rmse << "," << uncertainty_proxy << ","
-              << covariance_translation_std << ","
+              << prior_covariance_translation_std << ","
+              << predicted_posterior_covariance_translation_std << ","
+              << covariance_translation_std << "," << view_novelty << ","
+              << observability_score << ","
               << candidates_generated << "," << reachable_candidates << ","
               << reachable_ratio << "\n";
     csv_file_.flush();
