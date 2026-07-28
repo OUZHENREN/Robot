@@ -5,6 +5,7 @@
 #include <pcl/registration/icp.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/filters/voxel_grid.h>
+#include <limits>
 
 namespace cs625_nbv {
 
@@ -12,6 +13,7 @@ namespace cs625_nbv {
 class PoseEstimator::Impl {
 public:
     pcl::PointCloud<pcl::PointXYZ>::Ptr model_cloud;
+    double last_registration_rmse{std::numeric_limits<double>::quiet_NaN()};
 };
 
 PoseEstimator::PoseEstimator()
@@ -81,6 +83,9 @@ Eigen::Isometry3d PoseEstimator::estimate_pose(
 
     pcl::PointCloud<pcl::PointXYZ> aligned;
     icp.align(aligned, init_guess);
+    impl_->last_registration_rmse = icp.hasConverged()
+        ? std::sqrt(std::max(0.0, icp.getFitnessScore()))
+        : std::numeric_limits<double>::infinity();
 
     // Get the final transformation
     Eigen::Matrix4f result_matrix = icp.getFinalTransformation();
@@ -89,6 +94,11 @@ Eigen::Isometry3d PoseEstimator::estimate_pose(
     result.linear() = result_matrix.block<3, 3>(0, 0).cast<double>();
 
     return result;
+}
+
+double PoseEstimator::last_registration_rmse() const
+{
+    return impl_->last_registration_rmse;
 }
 
 geometry_msgs::msg::PoseStamped PoseEstimator::to_pose_stamped(

@@ -1,12 +1,13 @@
 #include "cs625_nbv/baseline_strategies.hpp"
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <stdexcept>
 
 namespace cs625_nbv {
 
-BaselineStrategies::BaselineStrategies()
-    : rng_(std::random_device{}()) {}
+BaselineStrategies::BaselineStrategies(uint32_t random_seed)
+    : rng_(random_seed) {}
 
 int BaselineStrategies::select_next(
     Type type,
@@ -22,6 +23,7 @@ int BaselineStrategies::select_next(
         case COVERAGE_GREEDY:    return select_coverage_greedy(candidates);
         case UNCERTAINTY_ONLY:   return select_uncertainty_only(candidates);
         case POSE_GAIN:          return select_pose_gain(candidates);
+        case PATH_COST_ONLY:     return select_path_cost_only(candidates);
         default: return -1;
     }
 }
@@ -37,6 +39,7 @@ int BaselineStrategies::select_by_name(
     if (strategy_name == "coverage_greedy")    return select_coverage_greedy(candidates);
     if (strategy_name == "uncertainty_only")   return select_uncertainty_only(candidates);
     if (strategy_name == "pose_gain")          return select_pose_gain(candidates);
+    if (strategy_name == "path_cost_only")     return select_path_cost_only(candidates);
     return -1;
 }
 
@@ -144,6 +147,25 @@ int BaselineStrategies::select_pose_gain(
         if (!candidates[i].reachable) continue;
         if (candidates[i].utility_score > best_utility) {
             best_utility = candidates[i].utility_score;
+            best_idx = i;
+        }
+    }
+    return best_idx;
+}
+
+// ---------------------------------------------------------------------------
+// Strategy 6: Path Cost Only — minimize the virtual trajectory proxy.
+// ---------------------------------------------------------------------------
+int BaselineStrategies::select_path_cost_only(
+    const std::vector<cs625_nbv::msg::ViewpointCandidate>& candidates)
+{
+    int best_idx = -1;
+    double best_cost = std::numeric_limits<double>::infinity();
+    for (int i = 0; i < static_cast<int>(candidates.size()); ++i) {
+        if (!candidates[i].reachable) continue;
+        const double cost = candidates[i].path_length + candidates[i].planning_time;
+        if (cost < best_cost) {
+            best_cost = cost;
             best_idx = i;
         }
     }

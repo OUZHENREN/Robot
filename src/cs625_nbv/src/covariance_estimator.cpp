@@ -7,7 +7,7 @@
 namespace cs625_nbv {
 
 CovarianceEstimator::CovarianceEstimator(int K, double trans_noise, double rot_noise)
-    : K_(K), trans_noise_(trans_noise), rot_noise_(rot_noise) {}
+    : K_(K), trans_noise_(trans_noise), rot_noise_(rot_noise), generator_(6252024U) {}
 
 Eigen::Matrix<double, 6, 6> CovarianceEstimator::estimate_covariance(
     PoseEstimator& estimator,
@@ -59,18 +59,17 @@ Eigen::Matrix<double, 6, 6> CovarianceEstimator::estimate_covariance(
 
 Eigen::Isometry3d CovarianceEstimator::perturb_pose(const Eigen::Isometry3d& pose)
 {
-    static thread_local std::mt19937 gen(6252024 + std::hash<std::thread::id>{}(std::this_thread::get_id()));
     std::normal_distribution<double> trans_dist(0.0, trans_noise_);
     std::normal_distribution<double> rot_dist(0.0, rot_noise_);
 
     // Perturb translation
     Eigen::Vector3d trans_perturb(
-        trans_dist(gen), trans_dist(gen), trans_dist(gen)
+        trans_dist(generator_), trans_dist(generator_), trans_dist(generator_)
     );
 
     // Perturb rotation (small rotation vector)
     Eigen::Vector3d rot_perturb(
-        rot_dist(gen), rot_dist(gen), rot_dist(gen)
+        rot_dist(generator_), rot_dist(generator_), rot_dist(generator_)
     );
     double angle = rot_perturb.norm();
     Eigen::AngleAxisd rot_aa;

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <random>
+#include <cstdint>
 #include "cs625_nbv/msg/viewpoint_candidate.hpp"
 
 namespace cs625_nbv {
@@ -23,9 +24,13 @@ public:
         COVERAGE_GREEDY = 3,
         UNCERTAINTY_ONLY = 4,
         POSE_GAIN = 5,  // The proposed method
+        PATH_COST_ONLY = 6,
     };
 
-    BaselineStrategies();
+    explicit BaselineStrategies(uint32_t random_seed = 625U);
+
+    /// Reset the random baseline to a reproducible seed.
+    void set_random_seed(uint32_t random_seed) { rng_.seed(random_seed); }
 
     /**
      * @brief Select the next viewpoint using the given strategy.
@@ -57,6 +62,7 @@ private:
     int select_coverage_greedy(std::vector<cs625_nbv::msg::ViewpointCandidate>& candidates);
     int select_uncertainty_only(std::vector<cs625_nbv::msg::ViewpointCandidate>& candidates);
     int select_pose_gain(std::vector<cs625_nbv::msg::ViewpointCandidate>& candidates);
+    int select_path_cost_only(const std::vector<cs625_nbv::msg::ViewpointCandidate>& candidates);
 };
 
 }  // namespace cs625_nbv

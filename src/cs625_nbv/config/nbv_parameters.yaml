@@ -41,3 +41,11 @@ cs625_nbv:
     log_base_dir: "~/nbv_experiments"
     save_clouds: true
     save_covariance: true
+    data_source: "synthetic_smoke_test"
+    validity_label: "interface_only"
+    random_seed: 625
+    git_commit: "unknown"
+    launch_profile: "synthetic_headless"
+    use_model_cloud_topic: false
+    virtual_camera_settle_ms: 250
+    covariance_bootstrap_samples: 30

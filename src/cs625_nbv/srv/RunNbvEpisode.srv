@@ -7,4 +7,5 @@ int32 max_views                # Maximum number of views (default: 6)
 # Response: episode complete
 bool success                   # True if episode ran without error
 string message                 # Error description if failed
+string output_directory        # Directory containing CSV/JSON exports
 cs625_nbv/EpisodeResult result # Full episode result

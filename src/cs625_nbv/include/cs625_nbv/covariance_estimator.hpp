@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <random>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include "cs625_nbv/pose_estimator.hpp"
 
@@ -58,11 +59,14 @@ public:
     static Eigen::Isometry3d tangent_to_pose(const Eigen::Matrix<double, 6, 1>& xi);
 
     int get_K() const { return K_; }
+    void set_K(int K) { K_ = K > 1 ? K : 2; }
+    void set_seed(uint32_t seed) { generator_.seed(seed); }
 
 private:
     int K_;
     double trans_noise_;
     double rot_noise_;
+    std::mt19937 generator_;
 };
 
 }  // namespace cs625_nbv

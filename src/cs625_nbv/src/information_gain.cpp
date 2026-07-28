@@ -129,8 +129,19 @@ void score_candidates(
         // will set the target center before calling this function.
         Eigen::Vector3d target(0.5, 0.3, 0.845);
 
-        // Estimate visibility fraction (simplified: assume 80% visible)
-        double visibility = 0.8;
+        // Analytic virtual-cuboid visibility predictor. It only uses the
+        // candidate pose and known model dimensions, not the captured cloud.
+        // This gives the uncertainty-only/PoseGain ablation non-identical
+        // scores while preserving a causal, pre-observation selection rule.
+        const Eigen::Vector3d view_dir = (cam_pose.translation() - target).normalized();
+        constexpr double area_yz = 0.06 * 0.10;
+        constexpr double area_xz = 0.08 * 0.10;
+        constexpr double area_xy = 0.08 * 0.06;
+        const double projected_area = area_yz * std::abs(view_dir.x())
+            + area_xz * std::abs(view_dir.y())
+            + area_xy * std::abs(view_dir.z());
+        const double visibility = std::max(0.05, std::min(1.0,
+            0.8 * projected_area / (area_yz + area_xz + area_xy)));
 
         Eigen::Matrix<double, 6, 6> expected = ig.expected_covariance(
             current_covariance, cam_pose, target, visibility

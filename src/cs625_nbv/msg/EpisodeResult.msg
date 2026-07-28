@@ -4,6 +4,10 @@
 string strategy_name           # Name of the strategy used
 string scene_name              # Identifier of the occlusion scene
 int32 episode_id               # Episode number (for repeats)
+string run_id                  # Unique timestamp-based identifier
+string data_source             # synthetic_smoke_test, gazebo_rgbd, or real_camera
+string validity_label          # interface_only or research_candidate
+int32 random_seed              # Seed used by stochastic strategies
 
 # Final pose estimation quality
 float64 final_translation_error  # Final translation error (m)
@@ -25,6 +29,7 @@ float64 unreachable_ratio      # unreachable / generated
 # Convergence metrics
 bool converged                 # True if stopped by convergence criteria
 int32 stop_reason              # 0=converged, 1=max_views, 2=timeout, 3=error
+string failure_reason          # Empty on success; machine-readable failure detail
 
 # Per-viewpoint breakdown
 float64[] ig_per_view          # Information gain achieved at each view

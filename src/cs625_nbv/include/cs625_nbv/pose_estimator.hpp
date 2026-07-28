@@ -45,6 +45,10 @@ public:
         double max_correspondence_distance = 0.05
     );
 
+    /// ICP point-to-point RMS residual from the most recent estimate (metres).
+    /// This is an observation-conditioned uncertainty proxy, not ground truth.
+    double last_registration_rmse() const;
+
     /**
      * @brief Convert Eigen transform to ROS PoseStamped.
      */

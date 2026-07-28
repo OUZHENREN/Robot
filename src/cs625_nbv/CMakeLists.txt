@@ -49,6 +49,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/EpisodeResult.msg"
   "srv/RunNbvEpisode.srv"
   "srv/GetExperimentResults.srv"
+  "srv/ExportExperimentData.srv"
   DEPENDENCIES
     std_msgs
     geometry_msgs
@@ -123,6 +124,7 @@ add_executable(synthetic_camera_publisher_node src/synthetic_camera_publisher_no
 ament_target_dependencies(synthetic_camera_publisher_node
   rclcpp
   sensor_msgs
+  geometry_msgs
 )
 
 # ---------------------------------------------------------------------------

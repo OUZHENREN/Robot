@@ -1,0 +1,9 @@
+# Export in-memory experiment summaries to one report-ready CSV file.
+string output_path             # Empty = <log_base_dir>/report_export_<timestamp>.csv
+int32 latest_count             # 0 = all results held by this server
+string filter_strategy         # Empty = all strategies
+---
+bool success
+string message
+string output_file
+int32 rows_exported
