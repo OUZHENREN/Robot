@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# P2/P3 software-only experiment: run matched-seed baseline and ablation
+# P2/P3/P4 software-only experiment: run matched-seed baseline and ablation
 # episodes against the viewpoint-dependent virtual cuboid observation model.
 # It never starts a real driver, camera, IO, or trajectory-execution path.
 
@@ -68,13 +68,15 @@ source "$ROS_SETUP"
 source install/setup.bash
 set -u
 cd "$WORKSPACE"
-GIT_COMMIT="$(git rev-parse HEAD 2>/dev/null || printf 'unknown')"
+GIT_COMMIT="${CS625_GIT_COMMIT:-$(git rev-parse HEAD 2>/dev/null || printf 'unknown')}"
 
 cat > "$RUN_DIR/manifest.yaml" <<EOF
 data_source: synthetic_view_dependent
 validity_label: research_candidate
 research_scope: virtual-cuboid simulation; ground truth T_base_model is identity
 planning_cost_model: euclidean_viewpoint_proxy
+uncertainty_model: p4_sequential_information_fusion_virtual_only
+observability_model: projected_visibility_times_view_novelty
 occlusion_level: $OCCLUSION_LEVEL
 depth_noise_std_m: 0.001
 scene_name: $SCENE_NAME
@@ -122,7 +124,9 @@ for strategy in $STRATEGIES; do
     timeout 120 ros2 service call /cs625_nbv/run_episode cs625_nbv/srv/RunNbvEpisode \
       "{target_object_id: 'target_object', strategy_name: '$strategy', max_views: 6}" \
       | tee "$response"
-    grep -Eqi 'success[=:][[:space:]]*true' "$response"
+    # ROS 2 Python clients currently print success=True, while some CLI
+    # versions print success: true. Accept both representations.
+    grep -Eqi 'success[[:space:]]*[=:][[:space:]]*(true|True)' "$response"
     episode_dir="$(sed -n "s/.*output_directory=['\"]\([^'\"]*\).*/\1/p" "$response" | tail -n 1)"
     [[ -n "$episode_dir" && -f "$episode_dir/report_summary.csv" ]] || { printf 'Missing output for %s/%s\n' "$strategy" "$replicate" >&2; exit 1; }
     run_id="$(basename "$episode_dir")"
