@@ -48,7 +48,9 @@ for k = 1:numel(files)
     seed(end+1,1) = row.random_seed; %#ok<AGROW>
     finalError(end+1,1) = row.final_translation_error_m; %#ok<AGROW>
     converged(end+1,1) = localLogical(row.converged); %#ok<AGROW>
-    failure(end+1,1) = row.failure_reason; %#ok<AGROW>
+    failureValue = string(row.failure_reason);
+    if ismissing(failureValue), failureValue = ""; end
+    failure(end+1,1) = failureValue; %#ok<AGROW>
 end
 episodes = table(runId, scene, strategy, seed, finalError, converged, failure);
 writetable(episodes, fullfile(outputDir, 'p6_episode_summary.csv'));
@@ -67,7 +69,7 @@ for s = 1:numel(scenes)
     end
     if ~isequal(seedSets{1}, seedSets{2}, seedSets{3}), designComplete = false; end
 end
-if any(episodes.failure ~= "")
+if any(~ismissing(episodes.failure) & episodes.failure ~= "")
     designComplete = false;
 end
 
