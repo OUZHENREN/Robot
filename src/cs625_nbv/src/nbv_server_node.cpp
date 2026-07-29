@@ -61,6 +61,7 @@ public:
         this->declare_parameter(
             "observability_model", "projected_visibility_times_view_novelty"
         );
+        this->declare_parameter("sensor_noise_seed_contract", "unspecified");
         this->declare_parameter("virtual_initial_translation_bias_m", 0.0);
         this->declare_parameter("virtual_initial_covariance_std_m", 0.0);
 
@@ -407,6 +408,8 @@ private:
                << this->get_parameter("uncertainty_model").as_string() << "\n"
                << "observability_model: "
                << this->get_parameter("observability_model").as_string() << "\n"
+               << "sensor_noise_seed_contract: "
+               << this->get_parameter("sensor_noise_seed_contract").as_string() << "\n"
                << "virtual_initial_translation_bias_m: "
                << this->get_parameter("virtual_initial_translation_bias_m").as_double() << "\n"
                << "virtual_initial_covariance_std_m: "

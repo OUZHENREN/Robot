@@ -52,6 +52,35 @@ public:
         this->declare_parameter("depth_noise_std", 0.0);
         this->declare_parameter("random_seed", 625);
 
+        // A matched-seed experiment changes random_seed before every episode.
+        // Reset the view epoch on *every* update (including an update to the
+        // same numeric value as the launch default), otherwise the noise key
+        // would inherit a previous episode's view_index_ and no longer be
+        // matched across strategies.
+        parameter_callback_ = this->add_on_set_parameters_callback(
+            [this](const std::vector<rclcpp::Parameter>& parameters) {
+                rcl_interfaces::msg::SetParametersResult result;
+                result.successful = true;
+                for (const auto& parameter : parameters) {
+                    if (parameter.get_name() == "random_seed") {
+                        if (parameter.get_type() != rclcpp::ParameterType::PARAMETER_INTEGER) {
+                            result.successful = false;
+                            result.reason = "random_seed must be an integer";
+                            return result;
+                        }
+                        view_index_ = 0;
+                        has_active_view_pose_ = false;
+                        RCLCPP_INFO(
+                            this->get_logger(),
+                            "Reset virtual sensor view epoch for random_seed=%ld",
+                            parameter.as_int()
+                        );
+                    }
+                }
+                return result;
+            }
+        );
+
         cloud_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(
             "/camera/points", rclcpp::QoS(1).transient_local());
         model_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(
@@ -181,6 +210,7 @@ private:
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr cloud_pub_, model_pub_, visible_model_pub_;
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr virtual_pose_sub_;
     rclcpp::TimerBase::SharedPtr timer_;
+    rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr parameter_callback_;
 };
 
 int main(int argc, char** argv)

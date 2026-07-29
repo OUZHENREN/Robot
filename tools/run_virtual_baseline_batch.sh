@@ -86,6 +86,7 @@ research_scope: virtual-cuboid simulation; ground truth T_base_model is identity
 planning_cost_model: euclidean_viewpoint_proxy
 uncertainty_model: $UNCERTAINTY_MODEL
 observability_model: $OBSERVABILITY_MODEL
+sensor_noise_seed_contract: random_seed_plus_7919_times_view_index_reset_per_episode
 occlusion_level: $OCCLUSION_LEVEL
 depth_noise_std_m: $DEPTH_NOISE_STD_M
 scene_name: $SCENE_NAME
@@ -126,6 +127,7 @@ setsid ros2 launch cs625_nbv nbv_pipeline.launch.py \
   random_seed:="$SEED_BASE" covariance_bootstrap_samples:="$BOOTSTRAP_SAMPLES" git_commit:="$GIT_COMMIT" \
   launch_profile:="$LAUNCH_PROFILE" \
   uncertainty_model:="$UNCERTAINTY_MODEL" observability_model:="$OBSERVABILITY_MODEL" \
+  sensor_noise_seed_contract:=random_seed_plus_7919_times_view_index_reset_per_episode \
   virtual_initial_translation_bias_m:="$VIRTUAL_INITIAL_TRANSLATION_BIAS_M" \
   virtual_initial_covariance_std_m:="$VIRTUAL_INITIAL_COVARIANCE_STD_M" \
   > "$RUN_DIR/nbv_pipeline.log" 2>&1 &
