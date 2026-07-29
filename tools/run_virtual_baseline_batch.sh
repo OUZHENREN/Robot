@@ -17,6 +17,7 @@ STRATEGIES="${CS625_STRATEGIES:-single_view fixed_order random_reachable uncerta
 UNCERTAINTY_MODEL="${CS625_UNCERTAINTY_MODEL:-p4_sequential_information_fusion_virtual_only}"
 OBSERVABILITY_MODEL="${CS625_OBSERVABILITY_MODEL:-projected_visibility_times_view_novelty}"
 LAUNCH_PROFILE="${CS625_LAUNCH_PROFILE:-virtual_baseline_batch_headless}"
+REQUIRE_CONTROLLERS="${CS625_REQUIRE_CONTROLLERS:-true}"
 RUN_DIR="$RUN_ROOT/$(date -u +%Y%m%dT%H%M%SZ)"
 SIM_PID=""
 NBV_PID=""
@@ -87,6 +88,7 @@ seed_base: $SEED_BASE
 covariance_bootstrap_samples: $BOOTSTRAP_SAMPLES
 replicates_per_strategy: $REPLICATES
 strategies: [$STRATEGIES]
+controller_check_required: $REQUIRE_CONTROLLERS
 git_commit: $GIT_COMMIT
 EOF
 
@@ -101,9 +103,14 @@ setsid ros2 launch eli_cs_robot_simulation_gz nbv_simulation.launch.py \
   enable_rgbd_sensor:=false launch_rviz:=false headless:=true \
   > "$RUN_DIR/simulation.log" 2>&1 &
 SIM_PID=$!
-wait_for "controller_manager" 90 ros2 service type /controller_manager/list_controllers
-wait_for "active joint controllers" 90 controllers_active
-ros2 control list_controllers -c /controller_manager > "$RUN_DIR/controllers.txt"
+if [[ "$REQUIRE_CONTROLLERS" == "true" ]]; then
+  wait_for "controller_manager" 90 ros2 service type /controller_manager/list_controllers
+  wait_for "active joint controllers" 90 controllers_active
+  ros2 control list_controllers -c /controller_manager > "$RUN_DIR/controllers.txt"
+else
+  printf 'SKIPPED: pure synthetic virtual-observation calibration does not execute robot controllers.\n' \
+    > "$RUN_DIR/controllers.txt"
+fi
 
 setsid ros2 launch cs625_nbv nbv_pipeline.launch.py \
   use_synthetic_camera:=true view_dependent_synthetic:=true \
