@@ -1,8 +1,10 @@
 #include "cs625_nbv/nbv_orchestrator.hpp"
 #include "cs625_nbv/baseline_strategies.hpp"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <iostream>
+#include <thread>
 
 namespace cs625_nbv {
 namespace {
@@ -151,7 +153,22 @@ EpisodeResult NbvOrchestrator::run_episode(
     sensor_msgs::msg::PointCloud2 bootstrap_cloud;
     double bootstrap_rmse = 0.0;
     if (capture_cb_) {
-        bootstrap_cloud = capture_cb_();
+        for (int attempt = 0; attempt < 20 && bootstrap_cloud.data.empty(); ++attempt) {
+            bootstrap_cloud = capture_cb_();
+            if (bootstrap_cloud.data.empty()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            }
+        }
+        if (bootstrap_cloud.data.empty()) {
+            // A service becoming available does not guarantee that the
+            // synthetic camera has published its first cloud. Continuing
+            // would emit a regularisation-floor covariance and a false
+            // convergence record, so reject this episode as invalid.
+            transition(ERROR_STATE);
+            result.failure_reason = "bootstrap_cloud_missing";
+            result.stop_reason = ERROR;
+            return result;
+        }
         Eigen::Isometry3d init_guess = Eigen::Isometry3d::Identity();
         if (observation_model_cb_) {
             const auto visible_model = observation_model_cb_();
@@ -164,6 +181,29 @@ EpisodeResult NbvOrchestrator::run_episode(
         current_covariance_ = covariance_estimator_.estimate_covariance(
             pose_estimator_, bootstrap_cloud, init_guess
         );
+    }
+    if (virtual_initial_translation_bias_m_ > 0.0) {
+        // A seed-derived direction prevents the benchmark from favouring one
+        // coordinate axis while keeping the injected error reproducible.
+        const double phase = std::fmod(
+            static_cast<double>(random_seed_) * 0.6180339887498949, 1.0
+        ) * 2.0 * M_PI;
+        Eigen::Vector3d direction(
+            std::cos(phase), std::sin(phase), 0.5 * std::sin(2.0 * phase)
+        );
+        direction.normalize();
+        current_pose_.translation() += virtual_initial_translation_bias_m_ * direction;
+        if (virtual_initial_covariance_std_m_ > 0.0) {
+            // The CSV reports sqrt(trace(Sigma_translation)), so distribute
+            // the requested scalar translation standard deviation across the
+            // three coordinate variances rather than inflating it by sqrt(3).
+            const double component_std = virtual_initial_covariance_std_m_ /
+                std::sqrt(3.0);
+            const double variance = component_std * component_std;
+            for (int i = 0; i < 3; ++i) {
+                current_covariance_(i, i) = std::max(current_covariance_(i, i), variance);
+            }
+        }
     }
     view_count_ = 1;
     const double initial_trans_error = translationErrorToVirtualTruth(current_pose_);
@@ -190,6 +230,8 @@ EpisodeResult NbvOrchestrator::run_episode(
         initial_covariance_std,
         initial_covariance_std,
         initial_covariance_std,
+        0.0,
+        virtual_initial_translation_bias_m_,
         1.0,
         0.0,
         0, 0
@@ -341,6 +383,9 @@ EpisodeResult NbvOrchestrator::run_episode(
         const double covariance_std = std::sqrt(std::max(0.0,
             current_covariance_(0, 0) + current_covariance_(1, 1) + current_covariance_(2, 2)
         ));
+        const double prior_covariance_std = std::sqrt(std::max(0.0,
+            prior_covariance(0, 0) + prior_covariance(1, 1) + prior_covariance(2, 2)
+        ));
         error_history_.push_back(trans_error);
         result.ig_per_view.push_back(ig_achieved);
         result.path_length_per_view.push_back(candidates[selected_idx].path_length);
@@ -364,6 +409,8 @@ EpisodeResult NbvOrchestrator::run_episode(
             prediction.prior_std,
             prediction.predicted_posterior_std,
             covariance_std,
+            prior_covariance_std - covariance_std,
+            virtual_initial_translation_bias_m_,
             prediction.view_novelty,
             prediction.observability_score,
             static_cast<int>(candidates.size()),

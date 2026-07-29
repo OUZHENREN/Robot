@@ -57,7 +57,10 @@ public:
                   double registration_rmse, double uncertainty_proxy,
                   double prior_covariance_translation_std,
                   double predicted_posterior_covariance_translation_std,
-                  double covariance_translation_std, double view_novelty,
+                  double covariance_translation_std,
+                  double observed_covariance_translation_std_reduction,
+                  double virtual_initial_translation_bias_m,
+                  double view_novelty,
                   double observability_score,
                   int candidates_generated, int reachable_candidates);
 

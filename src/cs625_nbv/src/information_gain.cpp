@@ -6,19 +6,6 @@
 namespace cs625_nbv {
 namespace {
 
-double projectedCuboidVisibility(const Eigen::Vector3d& view_direction)
-{
-    constexpr double area_yz = 0.06 * 0.10;
-    constexpr double area_xz = 0.08 * 0.10;
-    constexpr double area_xy = 0.08 * 0.06;
-    const double projected_area = area_yz * std::abs(view_direction.x())
-        + area_xz * std::abs(view_direction.y())
-        + area_xy * std::abs(view_direction.z());
-    return std::clamp(
-        0.8 * projected_area / (area_yz + area_xz + area_xy), 0.05, 1.0
-    );
-}
-
 Eigen::Matrix<double, 6, 6> regularizeCovariance(
     const Eigen::Matrix<double, 6, 6>& covariance)
 {
@@ -145,10 +132,10 @@ InformationGain::ObservationPrediction InformationGain::predict_observation(
 {
     ObservationPrediction prediction;
     const Eigen::Vector3d offset = camera_pose.translation() - target_center;
-    const Eigen::Vector3d view_direction = offset.squaredNorm() > 1e-12
-        ? offset.normalized()
-        : Eigen::Vector3d::UnitZ();
-    prediction.visibility_fraction = projectedCuboidVisibility(view_direction);
+    const Eigen::Vector3d view_direction = offset.squaredNorm() > 1e-12 ?
+        offset.normalized() : Eigen::Vector3d::UnitZ();
+    prediction.visibility_fraction = VirtualObservationModel::predicted_visible_fraction(
+        target_center, camera_pose, virtual_observation_config_);
     prediction.view_novelty = viewNovelty(view_direction, prior_view_directions);
     prediction.observability_score =
         prediction.visibility_fraction * prediction.view_novelty;
@@ -172,6 +159,11 @@ double InformationGain::compute_utility(
 void InformationGain::set_weights(const WeightConfig& w) { weights_ = w; }
 
 void InformationGain::set_utility_config(const UtilityConfig& u) { utility_ = u; }
+
+void InformationGain::set_virtual_observation_config(const VirtualObservationConfig& config)
+{
+    virtual_observation_config_ = config;
+}
 
 // ---------------------------------------------------------------------------
 // Free functions

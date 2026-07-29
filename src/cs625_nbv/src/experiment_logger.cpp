@@ -99,7 +99,8 @@ std::string ExperimentLogger::start_episode(
               << "ig_achieved,path_length,planning_time,"
               << "observation_points,visible_ratio,registration_rmse_m,uncertainty_proxy_m,"
               << "prior_covariance_translation_std_m,predicted_posterior_covariance_translation_std_m,"
-              << "covariance_translation_std_m,view_novelty,observability_score,"
+              << "covariance_translation_std_m,observed_covariance_translation_std_reduction_m,"
+              << "virtual_initial_translation_bias_m,view_novelty,observability_score,"
               << "candidates_generated,reachable_candidates,reachable_ratio\n";
     csv_file_ << std::setprecision(12);
     return current_episode_dir_;
@@ -115,7 +116,10 @@ void ExperimentLogger::log_step(
     double registration_rmse, double uncertainty_proxy,
     double prior_covariance_translation_std,
     double predicted_posterior_covariance_translation_std,
-    double covariance_translation_std, double view_novelty,
+    double covariance_translation_std,
+    double observed_covariance_translation_std_reduction,
+    double virtual_initial_translation_bias_m,
+    double view_novelty,
     double observability_score,
     int candidates_generated, int reachable_candidates)
 {
@@ -138,7 +142,9 @@ void ExperimentLogger::log_step(
               << registration_rmse << "," << uncertainty_proxy << ","
               << prior_covariance_translation_std << ","
               << predicted_posterior_covariance_translation_std << ","
-              << covariance_translation_std << "," << view_novelty << ","
+              << covariance_translation_std << ","
+              << observed_covariance_translation_std_reduction << ","
+              << virtual_initial_translation_bias_m << "," << view_novelty << ","
               << observability_score << ","
               << candidates_generated << "," << reachable_candidates << ","
               << reachable_ratio << "\n";
