@@ -1,8 +1,10 @@
 #include "cs625_nbv/nbv_orchestrator.hpp"
 #include "cs625_nbv/baseline_strategies.hpp"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <iostream>
+#include <thread>
 
 namespace cs625_nbv {
 namespace {
@@ -151,7 +153,22 @@ EpisodeResult NbvOrchestrator::run_episode(
     sensor_msgs::msg::PointCloud2 bootstrap_cloud;
     double bootstrap_rmse = 0.0;
     if (capture_cb_) {
-        bootstrap_cloud = capture_cb_();
+        for (int attempt = 0; attempt < 20 && bootstrap_cloud.data.empty(); ++attempt) {
+            bootstrap_cloud = capture_cb_();
+            if (bootstrap_cloud.data.empty()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            }
+        }
+        if (bootstrap_cloud.data.empty()) {
+            // A service becoming available does not guarantee that the
+            // synthetic camera has published its first cloud. Continuing
+            // would emit a regularisation-floor covariance and a false
+            // convergence record, so reject this episode as invalid.
+            transition(ERROR_STATE);
+            result.failure_reason = "bootstrap_cloud_missing";
+            result.stop_reason = ERROR;
+            return result;
+        }
         Eigen::Isometry3d init_guess = Eigen::Isometry3d::Identity();
         if (observation_model_cb_) {
             const auto visible_model = observation_model_cb_();

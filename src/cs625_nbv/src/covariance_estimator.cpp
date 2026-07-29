@@ -69,11 +69,18 @@ Eigen::Matrix<double, 6, 6> CovarianceEstimator::estimate_covariance(
     }
     Sigma /= static_cast<double>(K_ - 1);  // Unbiased estimator
 
-    // Ensure positive semi-definite (add small diagonal if needed)
-    for (int i = 0; i < 6; ++i) {
-        if (Sigma(i, i) < 1e-12) {
-            Sigma(i, i) = 1e-12;
-        }
+    // Bootstrap reruns share the same point cloud and model. ICP can return
+    // nearly identical local minima for every perturbed start, but that is not
+    // evidence of uncertainty below the perturbation already injected here.
+    // Keep a declared virtual uncertainty floor so downstream scoring cannot
+    // mistake numerical repeatability for sub-millimetre calibration.
+    const double translation_variance_floor = trans_noise_ * trans_noise_;
+    const double rotation_variance_floor = rot_noise_ * rot_noise_;
+    for (int i = 0; i < 3; ++i) {
+        Sigma(i, i) = std::max(Sigma(i, i), translation_variance_floor);
+    }
+    for (int i = 3; i < 6; ++i) {
+        Sigma(i, i) = std::max(Sigma(i, i), rotation_variance_floor);
     }
 
     return Sigma;
@@ -86,7 +93,9 @@ Eigen::Matrix<double, 6, 6> CovarianceEstimator::fuse_covariances(
 {
     const auto prior = regularizeCovariance(prior_covariance);
     const auto measurement = regularizeCovariance(measurement_covariance);
-    const auto information = prior.inverse() + measurement.inverse();
+    constexpr double kPriorWeight = 0.5;
+    const auto information = kPriorWeight * prior.inverse() +
+        (1.0 - kPriorWeight) * measurement.inverse();
     return regularizeCovariance(information.inverse());
 }
 
@@ -100,9 +109,10 @@ Eigen::Isometry3d CovarianceEstimator::fuse_pose_estimates(
     const auto prior = regularizeCovariance(prior_covariance);
     const auto measurement = regularizeCovariance(measurement_covariance);
     const auto posterior = fuse_covariances(prior, measurement);
+    constexpr double kPriorWeight = 0.5;
     const auto information_weighted_state =
-        prior.inverse() * pose_to_tangent(prior_pose) +
-        measurement.inverse() * pose_to_tangent(measurement_pose);
+        kPriorWeight * prior.inverse() * pose_to_tangent(prior_pose) +
+        (1.0 - kPriorWeight) * measurement.inverse() * pose_to_tangent(measurement_pose);
     return tangent_to_pose(posterior * information_weighted_state);
 }
 

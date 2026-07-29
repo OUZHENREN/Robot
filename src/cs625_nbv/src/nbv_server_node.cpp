@@ -54,6 +54,7 @@ public:
         this->declare_parameter("validity_label", "interface_only");
         this->declare_parameter("git_commit", "unknown");
         this->declare_parameter("launch_profile", "unknown");
+        this->declare_parameter("occlusion_level", "none");
 
         // Configure orchestrator
         cs625_nbv::CameraModel camera;
@@ -70,6 +71,11 @@ public:
         orchestrator_.configure(camera, stop,
             cs625_nbv::InformationGain::WeightConfig{},
             cs625_nbv::InformationGain::UtilityConfig{});
+        cs625_nbv::VirtualObservationConfig virtual_sensor;
+        const auto occlusion_level = this->get_parameter("occlusion_level").as_string();
+        virtual_sensor.occlusion_fraction = occlusion_level == "heavy" ? 0.50 :
+            (occlusion_level == "light" ? 0.20 : 0.0);
+        orchestrator_.set_virtual_observation_config(virtual_sensor);
         logger_ = std::make_unique<cs625_nbv::ExperimentLogger>(
             this->get_parameter("log_base_dir").as_string()
         );
@@ -294,7 +300,21 @@ private:
         init_view.pose.position.x = 0.3;
         init_view.pose.position.y = 0.3;
         init_view.pose.position.z = 0.9;
-        init_view.pose.orientation.w = 1.0;
+        const Eigen::Vector3d initial_position(
+            init_view.pose.position.x, init_view.pose.position.y, init_view.pose.position.z);
+        const Eigen::Vector3d z_axis = (target - initial_position).normalized();
+        Eigen::Vector3d x_axis = Eigen::Vector3d::UnitY().cross(z_axis);
+        if (x_axis.norm() < 1e-9) x_axis = Eigen::Vector3d::UnitX().cross(z_axis);
+        x_axis.normalize();
+        Eigen::Matrix3d rotation;
+        rotation.col(0) = x_axis;
+        rotation.col(1) = z_axis.cross(x_axis);
+        rotation.col(2) = z_axis;
+        const Eigen::Quaterniond initial_orientation(rotation);
+        init_view.pose.orientation.x = initial_orientation.x();
+        init_view.pose.orientation.y = initial_orientation.y();
+        init_view.pose.orientation.z = initial_orientation.z();
+        init_view.pose.orientation.w = initial_orientation.w();
 
         // Run episode
         const auto episode_start = std::chrono::steady_clock::now();

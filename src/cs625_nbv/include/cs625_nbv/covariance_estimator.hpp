@@ -44,10 +44,12 @@ public:
     );
 
     /**
-     * @brief Fuse independent local 6D covariance estimates in information form.
+     * @brief Conservatively fuse correlated local estimates by covariance intersection.
      *
-     * This virtual-experiment diagnostic assumes independent measurements and
-     * is not a calibrated hardware uncertainty model.
+     * Bootstrap ICP reruns share a cloud and model, so treating consecutive
+     * estimates as independent double-counts information and can collapse the
+     * covariance unrealistically. Equal-weight covariance intersection does
+     * not make that independence claim. It remains virtual-only diagnostics.
      */
     Eigen::Matrix<double, 6, 6> fuse_covariances(
         const Eigen::Matrix<double, 6, 6>& prior_covariance,

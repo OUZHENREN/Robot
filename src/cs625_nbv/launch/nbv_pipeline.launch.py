@@ -67,6 +67,7 @@ def generate_launch_description():
             {"git_commit": git_commit},
             {"launch_profile": launch_profile},
             {"scene_name": scene_name},
+            {"occlusion_level": occlusion_level},
         ],
     )
 

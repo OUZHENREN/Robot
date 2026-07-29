@@ -101,6 +101,9 @@ public:
     }
     void set_max_views(int max_views) { stop_.max_views = std::max(1, max_views); }
     void set_covariance_bootstrap_samples(int samples) { covariance_estimator_.set_K(samples); }
+    void set_virtual_observation_config(const VirtualObservationConfig& config) {
+        information_gain_.set_virtual_observation_config(config);
+    }
 
     /**
      * @brief Set the model point cloud for ICP registration.

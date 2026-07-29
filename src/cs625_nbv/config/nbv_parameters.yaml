@@ -50,8 +50,9 @@ cs625_nbv:
     virtual_camera_settle_ms: 250
     covariance_bootstrap_samples: 30
 
-    # ---- P4 virtual-only sequential observability diagnostics ----
-    # Each new bootstrap-ICP estimate is fused in local information form.
-    # Do not treat these values as calibrated real-camera uncertainty.
-    uncertainty_model: "p4_sequential_information_fusion_virtual_only"
-    observability_model: "projected_visibility_times_view_novelty"
+    # ---- P5 virtual-only calibrated-observation diagnostics ----
+    # Conservative covariance intersection avoids double-counting correlated
+    # bootstrap ICP estimates. The predictor and sensor share a pose-aware
+    # z-buffer model; neither is a calibrated real-camera uncertainty model.
+    uncertainty_model: "p5_covariance_intersection_virtual_only"
+    observability_model: "p5_pose_aware_zbuffer_visibility_times_view_novelty"

@@ -63,6 +63,7 @@ set(NBV_CORE_SOURCES
   src/pose_estimator.cpp
   src/covariance_estimator.cpp
   src/information_gain.cpp
+  src/virtual_observation_model.cpp
   src/nbv_orchestrator.cpp
   src/baseline_strategies.cpp
   src/experiment_logger.cpp
@@ -121,6 +122,7 @@ ament_target_dependencies(viewpoint_publisher_node
 
 # GPU-independent point-cloud source for remote software-only development.
 add_executable(synthetic_camera_publisher_node src/synthetic_camera_publisher_node.cpp)
+target_link_libraries(synthetic_camera_publisher_node cs625_nbv_core)
 ament_target_dependencies(synthetic_camera_publisher_node
   rclcpp
   sensor_msgs

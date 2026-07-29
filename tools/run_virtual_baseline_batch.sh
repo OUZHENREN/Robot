@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# P2/P3/P4 software-only experiment: run matched-seed baseline and ablation
+# P2/P3/P4/P5 software-only experiment: run matched-seed baseline and ablation
 # episodes against the viewpoint-dependent virtual cuboid observation model.
 # It never starts a real driver, camera, IO, or trajectory-execution path.
 
@@ -14,6 +14,9 @@ BOOTSTRAP_SAMPLES="${CS625_BOOTSTRAP_SAMPLES:-10}"
 OCCLUSION_LEVEL="${CS625_OCCLUSION_LEVEL:-light}"
 SCENE_NAME="${CS625_SCENE_NAME:-virtual_cuboid_${OCCLUSION_LEVEL}}"
 STRATEGIES="${CS625_STRATEGIES:-single_view fixed_order random_reachable uncertainty_only path_cost_only pose_gain}"
+UNCERTAINTY_MODEL="${CS625_UNCERTAINTY_MODEL:-p4_sequential_information_fusion_virtual_only}"
+OBSERVABILITY_MODEL="${CS625_OBSERVABILITY_MODEL:-projected_visibility_times_view_novelty}"
+LAUNCH_PROFILE="${CS625_LAUNCH_PROFILE:-virtual_baseline_batch_headless}"
 RUN_DIR="$RUN_ROOT/$(date -u +%Y%m%dT%H%M%SZ)"
 SIM_PID=""
 NBV_PID=""
@@ -75,8 +78,8 @@ data_source: synthetic_view_dependent
 validity_label: research_candidate
 research_scope: virtual-cuboid simulation; ground truth T_base_model is identity
 planning_cost_model: euclidean_viewpoint_proxy
-uncertainty_model: p4_sequential_information_fusion_virtual_only
-observability_model: projected_visibility_times_view_novelty
+uncertainty_model: $UNCERTAINTY_MODEL
+observability_model: $OBSERVABILITY_MODEL
 occlusion_level: $OCCLUSION_LEVEL
 depth_noise_std_m: 0.001
 scene_name: $SCENE_NAME
@@ -107,7 +110,7 @@ setsid ros2 launch cs625_nbv nbv_pipeline.launch.py \
   occlusion_level:="$OCCLUSION_LEVEL" depth_noise_std:=0.001 scene_name:="$SCENE_NAME" \
   data_source:=synthetic_view_dependent validity_label:=research_candidate \
   random_seed:="$SEED_BASE" covariance_bootstrap_samples:="$BOOTSTRAP_SAMPLES" git_commit:="$GIT_COMMIT" \
-  launch_profile:=virtual_baseline_batch_headless \
+  launch_profile:="$LAUNCH_PROFILE" \
   > "$RUN_DIR/nbv_pipeline.log" 2>&1 &
 NBV_PID=$!
 wait_for "complete model cloud" 60 ros2 topic echo /cs625_nbv/model_cloud --once --field width

@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include "cs625_nbv/msg/viewpoint_candidate.hpp"
+#include "cs625_nbv/virtual_observation_model.hpp"
 
 namespace cs625_nbv {
 
@@ -102,12 +103,16 @@ public:
      */
     void set_utility_config(const UtilityConfig& u);
 
+    /// Set the P5 virtual sensor model shared with the synthetic publisher.
+    void set_virtual_observation_config(const VirtualObservationConfig& config);
+
     /// Build diagonal weight matrix W (6×6).
     Eigen::Matrix<double, 6, 6> build_weight_matrix() const;
 
 private:
     WeightConfig weights_;
     UtilityConfig utility_;
+    VirtualObservationConfig virtual_observation_config_;
 };
 
 /**
