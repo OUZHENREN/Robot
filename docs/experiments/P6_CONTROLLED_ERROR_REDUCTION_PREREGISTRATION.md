@@ -28,7 +28,7 @@ matched baselines?
 | strategies | `fixed_order`, `random_reachable`, `pose_gain` |
 | scenes | none, light, heavy deterministic occlusion |
 | matched seeds | at least 20 per strategy and scene |
-| sensor noise | deterministic 1 mm depth noise, seed recorded per episode |
+| sensor noise | deterministic 1 mm depth noise; the random seed and view epoch reset on every episode |
 | initial condition | 15 mm seed-derived translation bias; declared 30 mm prior translation std |
 | budget | 6 views maximum; identical candidate set and initial camera pose |
 | primary endpoint | episode-level final virtual truth translation error (m) |
@@ -57,3 +57,8 @@ CS625_DEPTH_NOISE_STD_M=0.001
 
 The batch manifest and per-step CSV must contain the two initial-condition
 values before a P6 result is considered admissible.
+
+The per-episode `config.yaml` must also state
+`sensor_noise_seed_contract: random_seed_plus_7919_times_view_index_reset_per_episode`.
+Any batch collected before this contract was implemented is an invalid pilot,
+not P6 evidence.

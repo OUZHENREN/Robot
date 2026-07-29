@@ -30,6 +30,7 @@ def generate_launch_description():
     scene_name = LaunchConfiguration("scene_name")
     uncertainty_model = LaunchConfiguration("uncertainty_model")
     observability_model = LaunchConfiguration("observability_model")
+    sensor_noise_seed_contract = LaunchConfiguration("sensor_noise_seed_contract")
     virtual_initial_translation_bias_m = LaunchConfiguration("virtual_initial_translation_bias_m")
     virtual_initial_covariance_std_m = LaunchConfiguration("virtual_initial_covariance_std_m")
 
@@ -74,6 +75,7 @@ def generate_launch_description():
             {"occlusion_level": occlusion_level},
             {"uncertainty_model": uncertainty_model},
             {"observability_model": observability_model},
+            {"sensor_noise_seed_contract": sensor_noise_seed_contract},
             {"virtual_initial_translation_bias_m": virtual_initial_translation_bias_m},
             {"virtual_initial_covariance_std_m": virtual_initial_covariance_std_m},
         ],
@@ -162,6 +164,11 @@ def generate_launch_description():
             "observability_model",
             default_value="projected_visibility_times_view_novelty",
             description="Provenance label recorded in every episode config snapshot.",
+        ),
+        DeclareLaunchArgument(
+            "sensor_noise_seed_contract",
+            default_value="unspecified",
+            description="Sensor-noise seed/reset contract recorded in every episode config snapshot.",
         ),
         DeclareLaunchArgument(
             "virtual_initial_translation_bias_m",

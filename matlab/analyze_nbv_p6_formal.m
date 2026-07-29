@@ -31,6 +31,17 @@ for k = 1:numel(files)
     if row.data_source ~= "synthetic_view_dependent" || row.validity_label ~= "research_candidate"
         error('Non-P6 provenance in %s', files(k).folder);
     end
+    configPath = fullfile(files(k).folder, 'config.yaml');
+    if ~isfile(configPath), error('Missing P6 config snapshot: %s', files(k).folder); end
+    configText = string(fileread(configPath));
+    if ~contains(configText, ...
+            "sensor_noise_seed_contract: random_seed_plus_7919_times_view_index_reset_per_episode")
+        error('P6 sensor-noise seed contract missing in %s', configPath);
+    end
+    if ~contains(configText, "virtual_initial_translation_bias_m: 0.015") || ...
+            ~contains(configText, "virtual_initial_covariance_std_m: 0.03")
+        error('P6 controlled initial condition missing in %s', configPath);
+    end
     runId(end+1,1) = row.run_id; %#ok<AGROW>
     scene(end+1,1) = localScene(row.scene_name); %#ok<AGROW>
     strategy(end+1,1) = row.strategy_name; %#ok<AGROW>
