@@ -182,6 +182,29 @@ EpisodeResult NbvOrchestrator::run_episode(
             pose_estimator_, bootstrap_cloud, init_guess
         );
     }
+    if (virtual_initial_translation_bias_m_ > 0.0) {
+        // A seed-derived direction prevents the benchmark from favouring one
+        // coordinate axis while keeping the injected error reproducible.
+        const double phase = std::fmod(
+            static_cast<double>(random_seed_) * 0.6180339887498949, 1.0
+        ) * 2.0 * M_PI;
+        Eigen::Vector3d direction(
+            std::cos(phase), std::sin(phase), 0.5 * std::sin(2.0 * phase)
+        );
+        direction.normalize();
+        current_pose_.translation() += virtual_initial_translation_bias_m_ * direction;
+        if (virtual_initial_covariance_std_m_ > 0.0) {
+            // The CSV reports sqrt(trace(Sigma_translation)), so distribute
+            // the requested scalar translation standard deviation across the
+            // three coordinate variances rather than inflating it by sqrt(3).
+            const double component_std = virtual_initial_covariance_std_m_ /
+                std::sqrt(3.0);
+            const double variance = component_std * component_std;
+            for (int i = 0; i < 3; ++i) {
+                current_covariance_(i, i) = std::max(current_covariance_(i, i), variance);
+            }
+        }
+    }
     view_count_ = 1;
     const double initial_trans_error = translationErrorToVirtualTruth(current_pose_);
     const double initial_rot_error = rotationErrorToVirtualTruth(current_pose_);
@@ -207,6 +230,8 @@ EpisodeResult NbvOrchestrator::run_episode(
         initial_covariance_std,
         initial_covariance_std,
         initial_covariance_std,
+        0.0,
+        virtual_initial_translation_bias_m_,
         1.0,
         0.0,
         0, 0
@@ -358,6 +383,9 @@ EpisodeResult NbvOrchestrator::run_episode(
         const double covariance_std = std::sqrt(std::max(0.0,
             current_covariance_(0, 0) + current_covariance_(1, 1) + current_covariance_(2, 2)
         ));
+        const double prior_covariance_std = std::sqrt(std::max(0.0,
+            prior_covariance(0, 0) + prior_covariance(1, 1) + prior_covariance(2, 2)
+        ));
         error_history_.push_back(trans_error);
         result.ig_per_view.push_back(ig_achieved);
         result.path_length_per_view.push_back(candidates[selected_idx].path_length);
@@ -381,6 +409,8 @@ EpisodeResult NbvOrchestrator::run_episode(
             prediction.prior_std,
             prediction.predicted_posterior_std,
             covariance_std,
+            prior_covariance_std - covariance_std,
+            virtual_initial_translation_bias_m_,
             prediction.view_novelty,
             prediction.observability_score,
             static_cast<int>(candidates.size()),

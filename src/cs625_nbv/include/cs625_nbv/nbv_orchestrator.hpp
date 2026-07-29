@@ -42,6 +42,8 @@ public:
         double prior_covariance_translation_std{0.0};
         double predicted_posterior_covariance_translation_std{0.0};
         double covariance_translation_std{0.0};
+        double observed_covariance_translation_std_reduction{0.0};
+        double virtual_initial_translation_bias_m{0.0};
         double view_novelty{0.0};
         double observability_score{0.0};
         int candidates_generated{0};
@@ -104,6 +106,14 @@ public:
     void set_virtual_observation_config(const VirtualObservationConfig& config) {
         information_gain_.set_virtual_observation_config(config);
     }
+    // Virtual-only evaluation aid.  It creates a known, deterministic initial
+    // translation error and declares the corresponding prior covariance.  It
+    // is disabled by default and must never be used to label a hardware run.
+    void set_virtual_initial_pose_bias(double translation_bias_m,
+                                       double covariance_std_m) {
+        virtual_initial_translation_bias_m_ = std::max(0.0, translation_bias_m);
+        virtual_initial_covariance_std_m_ = std::max(0.0, covariance_std_m);
+    }
 
     /**
      * @brief Set the model point cloud for ICP registration.
@@ -158,6 +168,8 @@ private:
     uint32_t model_point_count_{0};
     Eigen::Vector3d current_camera_position_{Eigen::Vector3d::Zero()};
     std::vector<Eigen::Vector3d> executed_view_directions_;
+    double virtual_initial_translation_bias_m_{0.0};
+    double virtual_initial_covariance_std_m_{0.0};
 
     // Callbacks
     PlanCallback plan_cb_;

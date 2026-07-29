@@ -55,6 +55,14 @@ public:
         this->declare_parameter("git_commit", "unknown");
         this->declare_parameter("launch_profile", "unknown");
         this->declare_parameter("occlusion_level", "none");
+        this->declare_parameter(
+            "uncertainty_model", "p4_sequential_information_fusion_virtual_only"
+        );
+        this->declare_parameter(
+            "observability_model", "projected_visibility_times_view_novelty"
+        );
+        this->declare_parameter("virtual_initial_translation_bias_m", 0.0);
+        this->declare_parameter("virtual_initial_covariance_std_m", 0.0);
 
         // Configure orchestrator
         cs625_nbv::CameraModel camera;
@@ -285,6 +293,10 @@ private:
         orchestrator_.set_covariance_bootstrap_samples(
             this->get_parameter("covariance_bootstrap_samples").as_int()
         );
+        orchestrator_.set_virtual_initial_pose_bias(
+            this->get_parameter("virtual_initial_translation_bias_m").as_double(),
+            this->get_parameter("virtual_initial_covariance_std_m").as_double()
+        );
         orchestrator_.set_max_views(
             req->max_views > 0
                 ? req->max_views
@@ -367,6 +379,8 @@ private:
                 step.prior_covariance_translation_std,
                 step.predicted_posterior_covariance_translation_std,
                 step.covariance_translation_std,
+                step.observed_covariance_translation_std_reduction,
+                step.virtual_initial_translation_bias_m,
                 step.view_novelty,
                 step.observability_score,
                 step.candidates_generated,
@@ -389,8 +403,14 @@ private:
                     : 0) << "\n"
                << "ground_truth_pose_contract: T_base_model_identity_virtual_only\n"
                << "planning_cost_model: euclidean_viewpoint_proxy\n"
-               << "uncertainty_model: p4_sequential_information_fusion_virtual_only\n"
-               << "observability_model: projected_visibility_times_view_novelty\n"
+               << "uncertainty_model: "
+               << this->get_parameter("uncertainty_model").as_string() << "\n"
+               << "observability_model: "
+               << this->get_parameter("observability_model").as_string() << "\n"
+               << "virtual_initial_translation_bias_m: "
+               << this->get_parameter("virtual_initial_translation_bias_m").as_double() << "\n"
+               << "virtual_initial_covariance_std_m: "
+               << this->get_parameter("virtual_initial_covariance_std_m").as_double() << "\n"
                << "git_commit: " << metadata.git_commit << "\n"
                << "ros_distro: " << metadata.ros_distro << "\n"
                << "covariance_bootstrap_samples: "

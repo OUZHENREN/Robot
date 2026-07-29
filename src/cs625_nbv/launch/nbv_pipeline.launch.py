@@ -28,6 +28,10 @@ def generate_launch_description():
     git_commit = LaunchConfiguration("git_commit")
     launch_profile = LaunchConfiguration("launch_profile")
     scene_name = LaunchConfiguration("scene_name")
+    uncertainty_model = LaunchConfiguration("uncertainty_model")
+    observability_model = LaunchConfiguration("observability_model")
+    virtual_initial_translation_bias_m = LaunchConfiguration("virtual_initial_translation_bias_m")
+    virtual_initial_covariance_std_m = LaunchConfiguration("virtual_initial_covariance_std_m")
 
     synthetic_camera_node = Node(
         package="cs625_nbv",
@@ -68,6 +72,10 @@ def generate_launch_description():
             {"launch_profile": launch_profile},
             {"scene_name": scene_name},
             {"occlusion_level": occlusion_level},
+            {"uncertainty_model": uncertainty_model},
+            {"observability_model": observability_model},
+            {"virtual_initial_translation_bias_m": virtual_initial_translation_bias_m},
+            {"virtual_initial_covariance_std_m": virtual_initial_covariance_std_m},
         ],
     )
 
@@ -144,6 +152,29 @@ def generate_launch_description():
             "scene_name",
             default_value="default_scene",
             description="Scene label recorded in each virtual experiment export.",
+        ),
+        DeclareLaunchArgument(
+            "uncertainty_model",
+            default_value="p4_sequential_information_fusion_virtual_only",
+            description="Provenance label recorded in every episode config snapshot.",
+        ),
+        DeclareLaunchArgument(
+            "observability_model",
+            default_value="projected_visibility_times_view_novelty",
+            description="Provenance label recorded in every episode config snapshot.",
+        ),
+        DeclareLaunchArgument(
+            "virtual_initial_translation_bias_m",
+            default_value="0.0",
+            description=(
+                "Virtual-only deterministic initial translation bias for a controlled "
+                "error-reduction benchmark; leave at 0 for calibration or any non-virtual run."
+            ),
+        ),
+        DeclareLaunchArgument(
+            "virtual_initial_covariance_std_m",
+            default_value="0.0",
+            description="Declared virtual-only prior translation standard deviation paired with the injected bias.",
         ),
         synthetic_camera_node,
         nbv_server_node,
